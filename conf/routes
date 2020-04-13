@@ -13,4 +13,8 @@ GET     /message                    controllers.AsyncController.message
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-      
+
+# eeshop
+GET     /user                       controllers.UserController.index
+GET     /user/:id                   controllers.UserController.getUserById(id: Int)
+POST    /user/new/:e                controllers.UserController.addUser(e: String)
