@@ -39,7 +39,7 @@ CREATE TABLE "orders" (
 );
 
 CREATE TABLE "order_items" (
-    order_items_id INTEGER PRIMARY KEY,
+    order_item_id INTEGER PRIMARY KEY,
     order_id INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE "reviews" (
         ON DELETE SET NULL
 );
 
-CREATE TABLE "faq_note" (
+CREATE TABLE "faq_notes" (
     faq_note_id INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
     message TEXT NOT NULL
@@ -110,7 +110,7 @@ CREATE TABLE "faq_note" (
 
 # --- !Downs
 
-DROP TABLE "faq_note";
+DROP TABLE "faq_notes";
 DROP TABLE "reviews";
 DROP TABLE "shipments";
 DROP TABLE "payments";

@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject._
 import models.Review
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
@@ -12,12 +13,20 @@ class ReviewController @Inject()(cc: ControllerComponents)(implicit ec: Executio
   import dao.SQLiteReviewsComponent._
 
   def index = Action.async {
-    ReviewsRepository.all().map(users => Ok(users.map(_.toString).mkString(" ;;; ")))
+    ReviewsRepository.all().map(r => Ok(Json.toJson(r)))
   }
 
-  def addReview(productId: Int, authorId: Int, content: String) = Action.async {
-    val newUser = Review(0, productId, authorId, content)
-    ReviewsRepository.insertWithReturn(newUser).map(review => Ok(s"review with id=${review.reviewId} added!"))
+  def add() = Action.async {
+    val newUser = Review(0, 1, 1, "ccontent")
+    ReviewsRepository.insertWithReturn(newUser).map(r => Ok(Json.toJson(r)))
+  }
+
+  def delete(id: Int) = Action.async {
+    ReviewsRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
+  }
+
+  def update(id: Int) = Action.async {
+    ReviewsRepository.update(id, Review(id, 1, 1, "ccontent2")).map(r => Ok(Json.toJson(r)))
   }
 
 }

@@ -1,7 +1,8 @@
 package controllers
 
 import javax.inject._
-import models.{Product, ProductType, Review}
+import models.ProductType
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
@@ -12,12 +13,20 @@ class ProductTypeController @Inject()(cc: ControllerComponents)(implicit ec: Exe
   import dao.SQLiteProductTypesComponent._
 
   def index = Action.async {
-    ProductTypesRepository.all().map(users => Ok(users.map(_.toString).mkString(" ;;; ")))
+    ProductTypesRepository.all().map(r => Ok(Json.toJson(r)))
   }
 
   def addProductType(name: String) = Action.async {
     val newUser = ProductType(0, name, "desc")
-    ProductTypesRepository.insertWithReturn(newUser).map(review => Ok(s"review with id=${review.productTypeId} added!"))
+    ProductTypesRepository.insertWithReturn(newUser).map(r => Ok(Json.toJson(r)))
+  }
+
+  def deleteProductType(id: Int) = Action.async {
+    ProductTypesRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
+  }
+
+  def updateProductType(id: Int) = Action.async {
+    ProductTypesRepository.update(id, ProductType(id, "aaaa", "desc")).map(r => Ok(Json.toJson(r)))
   }
 
   def getProductTypesWithProducts() = Action.async {

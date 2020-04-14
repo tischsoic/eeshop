@@ -15,9 +15,46 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 
 # eeshop
+GET     /faqNote                    controllers.FaqNoteController.index
+POST    /faqNote                    controllers.FaqNoteController.add
+PUT     /faqNote/:id                controllers.FaqNoteController.update(id: Int)
+DELETE  /faqNote/:id                controllers.FaqNoteController.delete(id: Int)
+
+GET     /invoice                    controllers.InvoiceController.index
+POST    /invoice                    controllers.InvoiceController.add
+PUT     /invoice/:id                controllers.InvoiceController.update(id: Int)
+DELETE  /invoice/:id                controllers.InvoiceController.delete(id: Int)
+
+GET     /order                      controllers.OrderController.index
+POST    /order                      controllers.OrderController.add
+PUT     /order/:id                  controllers.OrderController.update(id: Int)
+DELETE  /order/:id                  controllers.OrderController.delete(id: Int)
+
+GET     /orderItem                  controllers.OrderItemController.index
+POST    /orderItem                  controllers.OrderItemController.add
+PUT     /orderItem/:id              controllers.OrderItemController.update(id: Int)
+DELETE  /orderItem/:id              controllers.OrderItemController.delete(id: Int)
+
+GET     /payment                    controllers.PaymentController.index
+POST    /payment                    controllers.PaymentController.add
+PUT     /payment/:id                controllers.PaymentController.update(id: Int)
+DELETE  /payment/:id                controllers.PaymentController.delete(id: Int)
+
+GET     /review                     controllers.ReviewController.index
+POST    /review                     controllers.ReviewController.add
+PUT     /review/:id                 controllers.ReviewController.update(id: Int)
+DELETE  /review/:id                 controllers.ReviewController.delete(id: Int)
+
+GET     /shipment                   controllers.ShipmentController.index
+POST    /shipment                   controllers.ShipmentController.add
+PUT     /shipment/:id               controllers.ShipmentController.update(id: Int)
+DELETE  /shipment/:id               controllers.ShipmentController.delete(id: Int)
+
 GET     /user                       controllers.UserController.index
 GET     /user/:id                   controllers.UserController.getUserById(id: Int)
 POST    /user/new/:e                controllers.UserController.addUser(e: String)
+PUT     /user/:id                   controllers.UserController.updateUser(id: Int)
+DELETE  /user/:id                   controllers.UserController.deleteUser(id: Int)
 
 GET     /product                    controllers.ProductController.index
 POST    /product/:ptId/:name        controllers.ProductController.addProduct(ptId: Int, name: String)

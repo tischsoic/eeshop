@@ -1,10 +1,12 @@
 package dao
 
 import java.sql.Date
+import java.text.SimpleDateFormat
 
 import models.OrderStatus.OrderStatus
 import models._
 import models.UserRole.UserRole
+import slick.sql.SqlProfile.ColumnOption.SqlType
 
 trait Tables { this: DatabaseComponent with ProfileComponent =>
 
@@ -20,6 +22,13 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   lazy val Shipments = TableQuery[ShipmentsTable]
   lazy val Reviews = TableQuery[ReviewsTable]
   lazy val FaqNotes = TableQuery[FaqNotesTable]
+
+  val sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS")
+  // lazy because otherwise MappedColumnType is null:
+  lazy implicit val dateColumnType = MappedColumnType.base[Date, String](
+    { date => sdf.format(date) },
+    { dateStr => new Date(sdf.parse(dateStr).getTime) } // map Int to Bool
+  )
 
   class UsersTable(tag: Tag) extends Table[User](tag, "users") {
     implicit val userRoleMapper = MappedColumnType.base[UserRole, String](
@@ -92,10 +101,16 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   }
 
   class InvoicesTable(tag: Tag) extends Table[Invoice](tag, "invoices") {
+//    val sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS")
+//    implicit val dateColumnType = MappedColumnType.base[Date, String](
+//      { date => sdf.format(date) },
+//      { dateStr => new Date(sdf.parse(dateStr).getTime) } // map Int to Bool
+//    )
+
     def invoiceId = column[Int]("invoice_id", O.PrimaryKey, O.AutoInc)
     def orderId = column[Int]("order_id")
     def totalCost = column[Double]("total_cost")
-    def date = column[Date]("date")
+    def date = column[Date]("date")(dateColumnType)
 
     def * = (invoiceId, orderId, totalCost, date) <> (Invoice.tupled, Invoice.unapply)
 
@@ -104,9 +119,15 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   }
 
   class PaymentsTable(tag: Tag) extends Table[Payment](tag, "payments") {
+//    val sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS")
+//    implicit val dateColumnType = MappedColumnType.base[Date, String](
+//      { date => sdf.format(date) },
+//      { dateStr => new Date(sdf.parse(dateStr).getTime) } // map Int to Bool
+//    )
+
     def paymentId = column[Int]("payment_id", O.PrimaryKey, O.AutoInc)
     def invoiceId = column[Int]("invoice_id")
-    def date = column[Date]("date")
+    def date = column[Date]("date")(dateColumnType)
     def sum = column[Double]("sum")
 
     def * = (paymentId, invoiceId, date, sum) <> (Payment.tupled, Payment.unapply)
@@ -116,9 +137,15 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   }
 
   class ShipmentsTable(tag: Tag) extends Table[Shipment](tag, "shipments") {
+//    val sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS")
+//    implicit val dateColumnType = MappedColumnType.base[Date, String](
+//      { date => sdf.format(date) },
+//      { dateStr => new Date(sdf.parse(dateStr).getTime) } // map Int to Bool
+//    )
+
     def shipmentId = column[Int]("shipment_id", O.PrimaryKey, O.AutoInc)
     def orderId = column[Int]("order_id")
-    def date = column[Date]("date")
+    def date = column[Date]("date")(dateColumnType)
     def trackingCode = column[String]("tracking_code")
 
     def * = (shipmentId, orderId, date, trackingCode) <> (Shipment.tupled, Shipment.unapply)
@@ -144,7 +171,7 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
 
   class FaqNotesTable(tag: Tag) extends Table[FaqNote](tag, "faq_notes") {
     def faqNoteId = column[Int]("faq_note_id", O.PrimaryKey, O.AutoInc)
-    def title = column[String]("order_id")
+    def title = column[String]("title")
     def message = column[String]("message")
 
     def * = (faqNoteId, title, message) <> (FaqNote.tupled, FaqNote.unapply)

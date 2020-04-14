@@ -4,7 +4,8 @@ import java.sql.Date
 
 import models.OrderStatus.OrderStatus
 import models.UserRole.UserRole
-import play.api.libs.json.{Reads, Writes}
+import play.api.libs.json._
+import utils.EnumUtils
 
 case class User(userId: Int, email: String, firstName: String, lastName: String, password: String, role: UserRole)
 case class ProductType(productTypeId: Int, name: String, description: String)
@@ -21,6 +22,12 @@ object UserRole extends Enumeration {
   type UserRole = Value
   val Staff: UserRole.Value = Value("staff")
   val Customer: UserRole.Value = Value("customer")
+
+//  implicit val readsUserRole = Reads.enumNameReads(UserRole)
+//  implicit val writesUserRole = Writes.enumNameWrites
+
+  implicit val enumReads: Reads[UserRole] = EnumUtils.enumReads(UserRole)
+  implicit def enumWrites: Writes[UserRole] = EnumUtils.enumWrites
 }
 
 object OrderStatus extends Enumeration {
@@ -30,6 +37,59 @@ object OrderStatus extends Enumeration {
   val Sent: OrderStatus.Value = Value("sent")
   val Delivered: OrderStatus.Value = Value("delivered")
 
-  implicit val readsOrderStatus = Reads.enumNameReads(OrderStatus)
-  implicit val writesOrderStatus = Writes.enumNameWrites
+//  implicit val readsOrderStatus = Reads.enumNameReads(OrderStatus)
+//  implicit val writesOrderStatus = Writes.enumNameWrites
+
+  implicit val enumReads: Reads[OrderStatus] = EnumUtils.enumReads(OrderStatus)
+  implicit def enumWrites: Writes[OrderStatus] = EnumUtils.enumWrites
+}
+
+object User {
+  implicit val userJsonFormat = Json.format[User]
+  def tupled = (this.apply _).tupled
+}
+
+object ProductType {
+  implicit val productTypeJsonFormat = Json.format[ProductType]
+  def tupled = (this.apply _).tupled
+}
+
+object Product {
+  implicit val productJsonFormat = Json.format[Product]
+  def tupled = (this.apply _).tupled
+}
+
+object Order {
+  implicit val orderJsonFormat = Json.format[Order]
+  def tupled = (this.apply _).tupled
+}
+
+object OrderItem {
+  implicit val orderItemJsonFormat: OFormat[OrderItem] = Json.format[OrderItem]
+  def tupled = (this.apply _).tupled
+}
+
+object Invoice {
+  implicit val invoiceJsonFormat = Json.format[Invoice]
+  def tupled = (this.apply _).tupled
+}
+
+object Payment {
+  implicit val paymentJsonFormat: OFormat[Payment] = Json.format[Payment]
+  def tupled = (this.apply _).tupled
+}
+
+object Shipment {
+  implicit val shipmentJsonFormat = Json.format[Shipment]
+  def tupled = (this.apply _).tupled
+}
+
+object Review {
+  implicit val reviewJsonFormat = Json.format[Review]
+  def tupled = (this.apply _).tupled
+}
+
+object FaqNote {
+  implicit val faqNoteJsonFormat = Json.format[FaqNote]
+  def tupled = (this.apply _).tupled
 }
