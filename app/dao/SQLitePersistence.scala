@@ -8,7 +8,3 @@ trait SQLitePersistence
   val profile = slick.jdbc.SQLiteProfile
   val db = Database.forConfig("slick.dbs.default.db")
 }
-
-//object SQLiteUserComponent
-//  extends UserComponent
-//    with SQLitePersistence

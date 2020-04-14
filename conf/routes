@@ -20,7 +20,9 @@ GET     /user/:id                   controllers.UserController.getUserById(id: I
 POST    /user/new/:e                controllers.UserController.addUser(e: String)
 
 GET     /product                    controllers.ProductController.index
-POST    /product/new/:productTypeId/:name  controllers.ProductController.addProduct(productTypeId: Int, name: String)
+POST    /product/:ptId/:name        controllers.ProductController.addProduct(ptId: Int, name: String)
+PUT     /product/:id/:newName       controllers.ProductController.updateProduct(id: Int, newName: String)
+DELETE  /product/:id                controllers.ProductController.deleteProduct(id: Int)
 
 GET     /productType                controllers.ProductTypeController.index
 GET     /productType/products       controllers.ProductTypeController.getProductTypesWithProducts

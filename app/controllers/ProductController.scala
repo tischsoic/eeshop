@@ -20,4 +20,12 @@ class ProductController @Inject()(cc: ControllerComponents)(implicit ec: Executi
     ProductsRepository.insertWithReturn(newUser).map(review => Ok(s"review with id=${review.productId} added!"))
   }
 
+  def deleteProduct(id: Int) = Action.async {
+    ProductsRepository.deleteById(id).map((r: Int) => Ok("a"))
+  }
+
+  def updateProduct(id: Int, newName: String) = Action.async {
+    ProductsRepository.update(id, Product(id, 1, newName, 10, "ddd", 11)).map(r => Ok("aa"))
+  }
+
 }

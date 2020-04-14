@@ -5,11 +5,8 @@ import java.sql.Date
 import models.OrderStatus.OrderStatus
 import models._
 import models.UserRole.UserRole
-import play.api.db.slick.HasDatabaseConfigProvider
-import slick.jdbc.JdbcProfile
 
 trait Tables { this: DatabaseComponent with ProfileComponent =>
-//  this: HasDatabaseConfigProvider[JdbcProfile] => {}
 
   import profile.api._
 
@@ -74,8 +71,8 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
 
     def * = (orderId, customerId, status) <> (Order.tupled, Order.unapply)
 
-//    def customer =
-//      foreignKey("customer_id", customerId, Users)(_.userId, onUpdate=ForeignKeyAction.Cascade, onDelete=ForeignKeyAction.Restrict)
+    def customer =
+      foreignKey("customer_id", customerId, Users)(_.userId, onUpdate=ForeignKeyAction.Cascade, onDelete=ForeignKeyAction.Restrict)
   }
 
   class OrderItemsTable(tag: Tag) extends Table[OrderItem](tag, "order_items") {

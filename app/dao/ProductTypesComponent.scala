@@ -1,18 +1,16 @@
 package dao
 
-import models.{Product, ProductType}
+import models.ProductType
 
 object SQLiteProductTypesComponent
   extends ProductTypesComponent
     with SQLitePersistence
 
 trait ProductTypesComponent extends Tables { this: DatabaseComponent with ProfileComponent =>
-
-  import slick.lifted.Tag
   import profile.api._
 
   object ProductTypesRepository extends Repository[ProductTypesTable, Int](profile, db) {
-    import this.profile.api._
+    import profile.api._
 
     val table = ProductTypes
     def getId(table: ProductTypesTable) = table.productTypeId
