@@ -8,10 +8,10 @@ import models.UserRole.UserRole
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-trait Tables {
-  this: HasDatabaseConfigProvider[JdbcProfile] => {}
+trait Tables { this: DatabaseComponent with ProfileComponent =>
+//  this: HasDatabaseConfigProvider[JdbcProfile] => {}
 
-  import dbConfig.profile.api._
+  import profile.api._
 
   lazy val Users = TableQuery[UsersTable]
   lazy val ProductTypes = TableQuery[ProductTypesTable]
@@ -49,7 +49,7 @@ trait Tables {
   }
 
   class ProductsTable(tag: Tag) extends Table[Product](tag, "products") {
-    def productId = column[Int]("user_id", O.PrimaryKey, O.AutoInc)
+    def productId = column[Int]("product_id", O.PrimaryKey, O.AutoInc)
     def productTypeId = column[Int]("product_type_id")
     def name = column[String]("name")
     def price = column[Double]("price")
@@ -74,8 +74,8 @@ trait Tables {
 
     def * = (orderId, customerId, status) <> (Order.tupled, Order.unapply)
 
-    def customer =
-      foreignKey("customer_id", customerId, Users)(_.userId, onUpdate=ForeignKeyAction.Cascade, onDelete=ForeignKeyAction.Restrict)
+//    def customer =
+//      foreignKey("customer_id", customerId, Users)(_.userId, onUpdate=ForeignKeyAction.Cascade, onDelete=ForeignKeyAction.Restrict)
   }
 
   class OrderItemsTable(tag: Tag) extends Table[OrderItem](tag, "order_items") {

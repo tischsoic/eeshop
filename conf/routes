@@ -18,3 +18,11 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 GET     /user                       controllers.UserController.index
 GET     /user/:id                   controllers.UserController.getUserById(id: Int)
 POST    /user/new/:e                controllers.UserController.addUser(e: String)
+
+GET     /product                    controllers.ProductController.index
+POST    /product/new/:productTypeId/:name  controllers.ProductController.addProduct(productTypeId: Int, name: String)
+
+GET     /productType                controllers.ProductTypeController.index
+GET     /productType/products       controllers.ProductTypeController.getProductTypesWithProducts
+POST    /productType/new/:name      controllers.ProductTypeController.addProductType(name: String)
+
