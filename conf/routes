@@ -51,8 +51,11 @@ PUT     /shipment/:id               controllers.ShipmentController.update(id: In
 DELETE  /shipment/:id               controllers.ShipmentController.delete(id: Int)
 
 GET     /user                       controllers.UserController.index
+GET     /user/create                controllers.UserController.create
+GET     /user/update/:id            controllers.UserController.update(id: Int)
 GET     /user/:id                   controllers.UserController.getUserById(id: Int)
-POST    /user/new/:e                controllers.UserController.addUser(e: String)
+POST    /user/                      controllers.UserController.handleCreate
+POST    /user/update                controllers.UserController.handleUpdate
 PUT     /user/:id                   controllers.UserController.updateUser(id: Int)
 DELETE  /user/:id                   controllers.UserController.deleteUser(id: Int)
 

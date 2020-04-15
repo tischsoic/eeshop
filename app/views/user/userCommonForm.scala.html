@@ -1,0 +1,25 @@
+@(userForm: Form[User], call: play.api.mvc.Call, submitBtnLabel: String)(implicit request: MessagesRequestHeader)
+
+@import helper._
+
+@form(call) {
+    @helper.CSRF.formField
+    @* "userId" -> number,*@
+    @* "email" -> email,*@
+    @* "firstName" -> nonEmptyText,*@
+    @* "lastName" -> nonEmptyText,*@
+    @* "password" -> nonEmptyText,*@
+    @* "role" -> Forms.of[UserRole]*@
+    <input type="hidden" name="userId" value="@userForm("userId").value" >
+    @inputText(userForm("email"))
+    @inputText(userForm("firstName"))
+    @inputText(userForm("lastName"))
+    @inputPassword(userForm("password"))
+
+    @select(
+        field = userForm("role"),
+        options = UserRole.values.map(_.toString).map(v => (v, v)).toSeq
+    )
+
+    <input type="submit" value="@submitBtnLabel" />
+}

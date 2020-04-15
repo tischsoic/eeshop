@@ -4,6 +4,8 @@ import java.sql.Date
 
 import models.OrderStatus.OrderStatus
 import models.UserRole.UserRole
+import play.api.data.FormError
+import play.api.data.format.Formatter
 import play.api.libs.json._
 import utils.EnumUtils
 
@@ -25,6 +27,16 @@ object UserRole extends Enumeration {
 
   implicit val enumReads: Reads[UserRole] = EnumUtils.enumReads(UserRole)
   implicit def enumWrites: Writes[UserRole] = EnumUtils.enumWrites
+
+  implicit def matchFilterFormat: Formatter[UserRole] = new Formatter[UserRole] {
+    override def bind(key: String, data: Map[String, String]) =
+      data.get(key)
+        .map(UserRole.withName)
+        .toRight(Seq(FormError(key, "error.required", Nil)))
+
+    override def unbind(key: String, value: UserRole) =
+      Map(key -> value.toString)
+  }
 }
 
 object OrderStatus extends Enumeration {
