@@ -24,6 +24,7 @@ abstract class Repository[T <: AbstractTable[_], I: BaseTypedType](val profile: 
   def insert(model: T#TableElementType) = db run (table += model)
 
   def insertWithReturn(model: T#TableElementType): Future[T#TableElementType] = {
+    // Ref https://stackoverflow.com/questions/31443505/slick-3-0-insert-and-then-get-auto-increment-value
     val insertQuery = table returning table.map(getId) into setId
     db.run(insertQuery += model)
   }

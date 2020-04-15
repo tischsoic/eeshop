@@ -23,9 +23,6 @@ object UserRole extends Enumeration {
   val Staff: UserRole.Value = Value("staff")
   val Customer: UserRole.Value = Value("customer")
 
-//  implicit val readsUserRole = Reads.enumNameReads(UserRole)
-//  implicit val writesUserRole = Writes.enumNameWrites
-
   implicit val enumReads: Reads[UserRole] = EnumUtils.enumReads(UserRole)
   implicit def enumWrites: Writes[UserRole] = EnumUtils.enumWrites
 }
@@ -36,9 +33,6 @@ object OrderStatus extends Enumeration {
   val Pack: OrderStatus.Value = Value("pack")
   val Sent: OrderStatus.Value = Value("sent")
   val Delivered: OrderStatus.Value = Value("delivered")
-
-//  implicit val readsOrderStatus = Reads.enumNameReads(OrderStatus)
-//  implicit val writesOrderStatus = Writes.enumNameWrites
 
   implicit val enumReads: Reads[OrderStatus] = EnumUtils.enumReads(OrderStatus)
   implicit def enumWrites: Writes[OrderStatus] = EnumUtils.enumWrites

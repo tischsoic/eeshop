@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat
 import models.OrderStatus.OrderStatus
 import models._
 import models.UserRole.UserRole
-import slick.sql.SqlProfile.ColumnOption.SqlType
 
 trait Tables { this: DatabaseComponent with ProfileComponent =>
 
@@ -23,7 +22,7 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   lazy val Reviews = TableQuery[ReviewsTable]
   lazy val FaqNotes = TableQuery[FaqNotesTable]
 
-  val sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS")
+  val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
   // lazy because otherwise MappedColumnType is null:
   lazy implicit val dateColumnType = MappedColumnType.base[Date, String](
     { date => sdf.format(date) },
@@ -69,9 +68,10 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   }
 
   class OrdersTable(tag: Tag) extends Table[Order](tag, "orders") {
+    // TODO: move this mapper to enum object???
     implicit val orderStatusMapper = MappedColumnType.base[OrderStatus, String](
-      e => e.toString,
-      s => OrderStatus.withName(s)
+      _.toString,
+      OrderStatus.withName
     )
 
     def orderId = column[Int]("order_id", O.PrimaryKey, O.AutoInc)
@@ -101,12 +101,6 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   }
 
   class InvoicesTable(tag: Tag) extends Table[Invoice](tag, "invoices") {
-//    val sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS")
-//    implicit val dateColumnType = MappedColumnType.base[Date, String](
-//      { date => sdf.format(date) },
-//      { dateStr => new Date(sdf.parse(dateStr).getTime) } // map Int to Bool
-//    )
-
     def invoiceId = column[Int]("invoice_id", O.PrimaryKey, O.AutoInc)
     def orderId = column[Int]("order_id")
     def totalCost = column[Double]("total_cost")
@@ -119,12 +113,6 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   }
 
   class PaymentsTable(tag: Tag) extends Table[Payment](tag, "payments") {
-//    val sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS")
-//    implicit val dateColumnType = MappedColumnType.base[Date, String](
-//      { date => sdf.format(date) },
-//      { dateStr => new Date(sdf.parse(dateStr).getTime) } // map Int to Bool
-//    )
-
     def paymentId = column[Int]("payment_id", O.PrimaryKey, O.AutoInc)
     def invoiceId = column[Int]("invoice_id")
     def date = column[Date]("date")(dateColumnType)
@@ -137,12 +125,6 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   }
 
   class ShipmentsTable(tag: Tag) extends Table[Shipment](tag, "shipments") {
-//    val sdf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS")
-//    implicit val dateColumnType = MappedColumnType.base[Date, String](
-//      { date => sdf.format(date) },
-//      { dateStr => new Date(sdf.parse(dateStr).getTime) } // map Int to Bool
-//    )
-
     def shipmentId = column[Int]("shipment_id", O.PrimaryKey, O.AutoInc)
     def orderId = column[Int]("order_id")
     def date = column[Date]("date")(dateColumnType)
