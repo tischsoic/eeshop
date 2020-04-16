@@ -3,10 +3,9 @@ package controllers
 import javax.inject._
 import models.UserRole.UserRole
 import models.{User, UserRole}
-import play.api.data._
+import models.DeleteForm.deleteForm
 import play.api.data.Forms._
-import play.api.data.format.Formatter
-import play.api.data.validation.Constraints._
+import play.api.data._
 import play.api.libs.json.Json
 import play.api.mvc._
 
@@ -73,6 +72,23 @@ class UserController @Inject()(cc: MessagesControllerComponents)(implicit ec: Ex
       user => {
         UserRepository.update(user.userId, user).map(
           _ => Redirect(routes.UserController.update(user.userId)).flashing("success" -> "user.updated")
+        )
+      }
+    )
+  }
+
+  def all = Action.async { implicit request: MessagesRequest[AnyContent] =>
+    UserRepository.all().map(users => Ok(views.html.user.all(users, deleteForm)))
+  }
+
+  def handleDelete() = Action.async { implicit request =>
+    deleteForm.bindFromRequest.fold(
+      _ => {
+        UserRepository.all().map(users => BadRequest(views.html.user.all(users, deleteForm)))
+      },
+      form => {
+        UserRepository.deleteById(form.id).map(
+          _ => Redirect(routes.UserController.all()).flashing("success" -> "user.deleted")
         )
       }
     )
