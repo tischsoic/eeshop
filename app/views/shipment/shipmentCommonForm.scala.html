@@ -1,0 +1,20 @@
+@(shipmentForm: Form[Shipment], orders: Seq[Order], call: play.api.mvc.Call, submitBtnLabel: String)(implicit request: MessagesRequestHeader)
+
+@import helper._
+
+@form(call) {
+    @helper.CSRF.formField
+@*    "shipmentId" -> default(number, 0),*@
+@*    "orderId" -> number,*@
+@*    "date" -> sqlDate,*@
+@*    "trackingCode" -> nonEmptyText*@
+    <input type="hidden" name="shipmentId" value="@shipmentForm("shipmentId").value" >
+    @select(
+        field = shipmentForm("orderId"),
+        options = orders.map(order => (order.orderId.toString, order.orderId.toString))
+    )
+    @inputDate(shipmentForm("date"))
+    @inputText(shipmentForm("trackingCode"))
+
+    <input type="submit" value="@submitBtnLabel" />
+}

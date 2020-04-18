@@ -48,6 +48,16 @@ object OrderStatus extends Enumeration {
 
   implicit val enumReads: Reads[OrderStatus] = EnumUtils.enumReads(OrderStatus)
   implicit def enumWrites: Writes[OrderStatus] = EnumUtils.enumWrites
+
+  implicit def matchFilterFormat: Formatter[OrderStatus] = new Formatter[OrderStatus] {
+    override def bind(key: String, data: Map[String, String]) =
+      data.get(key)
+        .map(OrderStatus.withName)
+        .toRight(Seq(FormError(key, "error.required", Nil)))
+
+    override def unbind(key: String, value: OrderStatus) =
+      Map(key -> value.toString)
+  }
 }
 
 object User {

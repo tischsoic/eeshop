@@ -1,0 +1,10 @@
+@(faqNoteForm: Form[FaqNote])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.faqNote.faqNoteCommonForm
+
+@title = @{"Update faqNote"}
+
+@main(title) {
+    @flash.get("success").getOrElse("")
+    @faqNoteCommonForm(faqNoteForm, routes.FaqNoteController.handleUpdate(), title)
+}

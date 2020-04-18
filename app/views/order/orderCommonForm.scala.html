@@ -1,0 +1,21 @@
+@(orderForm: Form[Order], users: Seq[User], call: play.api.mvc.Call, submitBtnLabel: String)(implicit request: MessagesRequestHeader)
+
+@import helper._
+
+@form(call) {
+    @helper.CSRF.formField
+@*    "orderId" -> default(number, 0),*@
+@*    "customerId" -> number,*@
+@*    "status" -> Forms.of[OrderStatus]*@
+    <input type="hidden" name="orderId" value="@orderForm("orderId").value" >
+    @select(
+        field = orderForm("customerId"),
+        options = users.map(user => (user.userId.toString, user.email))
+    )
+    @select(
+        field = orderForm("status"),
+        options = OrderStatus.values.map(_.toString).map(v => (v, v)).toSeq
+    )
+
+    <input type="submit" value="@submitBtnLabel" />
+}

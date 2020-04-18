@@ -1,0 +1,17 @@
+@(faqNotes: Seq[FaqNote], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import helper._
+
+@flash.get("success").getOrElse("")
+<ul>
+@for(faqNote <- faqNotes) {
+    <li>@faqNote.title <br />
+        @faqNote.message
+        @form(routes.FaqNoteController.handleDelete()) {
+            @helper.CSRF.formField
+            <input type="hidden" name="id" value="@faqNote.faqNoteId" >
+            <input type="submit" value="Delete" />
+        }
+    </li>
+}
+</ul>

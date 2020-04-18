@@ -1,0 +1,10 @@
+@(productForm: Form[Product], productTypes: Seq[ProductType])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.product.productCommonForm
+
+@title = @{"Create product"}
+
+@main(title) {
+    @flash.get("success").getOrElse("")
+    @productCommonForm(productForm, productTypes, routes.ProductController.handleCreate(), title)
+}

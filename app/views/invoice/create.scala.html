@@ -1,0 +1,10 @@
+@(invoiceForm: Form[Invoice], orders: Seq[Order])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.invoice.invoiceCommonForm
+
+@title = @{"Create invoice"}
+
+@main(title) {
+    @flash.get("success").getOrElse("")
+    @invoiceCommonForm(invoiceForm, orders, routes.InvoiceController.handleCreate(), title)
+}

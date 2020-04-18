@@ -1,0 +1,23 @@
+@(reviewForm: Form[Review], products: Seq[Product], users: Seq[User], call: play.api.mvc.Call, submitBtnLabel: String)(implicit request: MessagesRequestHeader)
+
+@import helper._
+
+@form(call) {
+    @helper.CSRF.formField
+@*    "reviewId" -> default(number, 0),*@
+@*    "productId" -> number,*@
+@*    "authorId" -> number,*@
+@*    "content" -> nonEmptyText*@
+    <input type="hidden" name="reviewId" value="@reviewForm("reviewId").value" >
+    @select(
+        field = reviewForm("productId"),
+        options = products.map(product => (product.productId.toString, product.name))
+    )
+    @select(
+        field = reviewForm("authorId"),
+        options = users.map(user => (user.userId.toString, user.email))
+    )
+    @inputText(reviewForm("content"))
+
+    <input type="submit" value="@submitBtnLabel" />
+}

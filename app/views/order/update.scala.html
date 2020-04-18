@@ -1,0 +1,10 @@
+@(orderForm: Form[Order], users: Seq[User])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.order.orderCommonForm
+
+@title = @{"Update order"}
+
+@main(title) {
+    @flash.get("success").getOrElse("")
+    @orderCommonForm(orderForm, users, routes.OrderController.handleUpdate(), title)
+}
