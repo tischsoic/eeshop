@@ -1,0 +1,21 @@
+@(invoiceForm: Form[Invoice], orders: Seq[Order], call: play.api.mvc.Call, submitBtnLabel: String)(implicit request: MessagesRequestHeader)
+
+@import helper._
+@import views.html.utils.priceInput
+
+@form(call) {
+    @helper.CSRF.formField
+@*    "invoiceId" -> default(number, 0),*@
+@*    "orderId" -> number,*@
+@*    "totalCost" -> Forms.of[Double].verifying(priceConstraint),*@
+@*    "date" -> sqlDate*@
+    <input type="hidden" name="invoiceId" value="@invoiceForm("invoiceId").value" >
+    @select(
+        field = invoiceForm("orderId"),
+        options = orders.map(order => (order.orderId.toString, order.orderId.toString))
+    )
+    @priceInput(invoiceForm("totalCost"))
+    @inputDate(invoiceForm("date"))
+
+    <input type="submit" value="@submitBtnLabel" />
+}

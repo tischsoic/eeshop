@@ -1,0 +1,15 @@
+@(productTypeForm: Form[ProductType], call: play.api.mvc.Call, submitBtnLabel: String)(implicit request: MessagesRequestHeader)
+
+@import helper._
+
+@form(call) {
+    @helper.CSRF.formField
+@*    "productTypeId" -> default(number, 0),*@
+@*    "name" -> nonEmptyText,*@
+@*    "description" -> nonEmptyText*@
+    <input type="hidden" name="productTypeId" value="@productTypeForm("productTypeId").value" >
+    @inputText(productTypeForm("name"))
+    @inputText(productTypeForm("description"))
+
+    <input type="submit" value="@submitBtnLabel" />
+}

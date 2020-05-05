@@ -1,0 +1,10 @@
+@(paymentForm: Form[Payment], invoices: Seq[Invoice])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.payment.paymentCommonForm
+
+@title = @{"Create payment"}
+
+@main(title) {
+    @flash.get("success").getOrElse("")
+    @paymentCommonForm(paymentForm, invoices, routes.PaymentController.handleCreate(), title)
+}

@@ -1,0 +1,16 @@
+@(products: Seq[Product], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import helper._
+
+@flash.get("success").getOrElse("")
+<ul>
+@for(product <- products) {
+    <li>@product.name
+        @form(routes.ProductController.handleDelete()) {
+            @helper.CSRF.formField
+            <input type="hidden" name="id" value="@product.productId" >
+            <input type="submit" value="Delete" />
+        }
+    </li>
+}
+</ul>
