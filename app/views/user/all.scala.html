@@ -1,0 +1,16 @@
+@(users: Seq[User], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import helper._
+
+@flash.get("success").getOrElse("")
+<ul>
+@for(user <- users) {
+    <li>@user.email
+        @form(routes.UserController.handleDelete()) {
+            @helper.CSRF.formField
+            <input type="hidden" name="id" value="@user.userId" >
+            <input type="submit" value="Delete" />
+        }
+    </li>
+}
+</ul>

@@ -1,0 +1,16 @@
+@(shipments: Seq[Shipment], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import helper._
+
+@flash.get("success").getOrElse("")
+<ul>
+@for(shipment <- shipments) {
+    <li>@shipment.shipmentId
+        @form(routes.ShipmentController.handleDelete()) {
+            @helper.CSRF.formField
+            <input type="hidden" name="id" value="@shipment.shipmentId" >
+            <input type="submit" value="Delete" />
+        }
+    </li>
+}
+</ul>

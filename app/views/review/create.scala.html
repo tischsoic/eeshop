@@ -1,0 +1,10 @@
+@(reviewForm: Form[Review], products: Seq[Product], users: Seq[User])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.review.reviewCommonForm
+
+@title = @{"Create review"}
+
+@main(title) {
+    @flash.get("success").getOrElse("")
+    @reviewCommonForm(reviewForm, products, users, routes.ReviewController.handleCreate(), title)
+}

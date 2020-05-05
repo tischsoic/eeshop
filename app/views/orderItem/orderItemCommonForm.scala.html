@@ -1,0 +1,26 @@
+@(orderItemForm: Form[OrderItem], orders: Seq[Order], products: Seq[Product], call: play.api.mvc.Call, submitBtnLabel: String)(implicit request: MessagesRequestHeader)
+
+@import helper._
+@import views.html.utils.priceInput
+
+@form(call) {
+    @helper.CSRF.formField
+@*    "orderItemId" -> default(number, 0),*@
+@*    "orderId" -> number,*@
+@*    "productId" -> number,*@
+@*    "quantity" -> number,*@
+@*    "price" -> Forms.of[Double].verifying(priceConstraint)*@
+    <input type="hidden" name="orderItemId" value="@orderItemForm("orderItemId").value" >
+    @select(
+        field = orderItemForm("orderId"),
+        options = orders.map(order => (order.orderId.toString, order.orderId.toString))
+    )
+    @select(
+        field = orderItemForm("productId"),
+        options = products.map(product => (product.productId.toString, product.name))
+    )
+    @inputText(orderItemForm("quantity"), 'type -> "number", Symbol("min") -> 0)
+    @priceInput(orderItemForm("price"))
+
+    <input type="submit" value="@submitBtnLabel" />
+}

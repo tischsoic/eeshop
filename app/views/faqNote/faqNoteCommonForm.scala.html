@@ -1,0 +1,15 @@
+@(faqNoteForm: Form[FaqNote], call: play.api.mvc.Call, submitBtnLabel: String)(implicit request: MessagesRequestHeader)
+
+@import helper._
+
+@form(call) {
+    @helper.CSRF.formField
+@*    "faqNoteId" -> default(number, 0),*@
+@*    "title" -> nonEmptyText,*@
+@*    "message" -> nonEmptyText,*@
+    <input type="hidden" name="faqNoteId" value="@faqNoteForm("faqNoteId").value" >
+    @inputText(faqNoteForm("title"))
+    @inputText(faqNoteForm("message"))
+
+    <input type="submit" value="@submitBtnLabel" />
+}
