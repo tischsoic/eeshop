@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 import models.DeleteForm.deleteForm
-import models.{Order, OrderItem}
+import models.{Order, OrderItem, Product}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.Json
@@ -32,8 +32,10 @@ class OrderItemController @Inject()(cc: MessagesControllerComponents)(implicit e
   }
 
   def create() = Action.async { implicit request: MessagesRequest[AnyContent] =>
-//    Future.sequence(List(OrdersRepository.all(), ProductsRepository.all())).map(
-//      { case List(orders: Seq[Order], products: Seq[Product]) =>
+    // TODO: interesting https://medium.com/@sderosiaux/are-scala-futures-the-past-69bd62b9c001#1cd0
+    // https://stackoverflow.com/questions/29289538/call-2-futures-in-the-same-action-async-scala-play
+//    Future.sequence(List(ProductsRepository.all(), OrdersRepository.all())).map(
+//      { case List(products: Seq[Product], orders: Seq[Order with Serializable]) =>
 //          Ok(views.html.orderItem.create(orderItemForm, orders, products)) }
 //    )
     OrdersRepository.all().flatMap(
