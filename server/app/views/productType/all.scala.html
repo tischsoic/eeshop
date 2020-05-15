@@ -1,16 +1,39 @@
 @(productTypes: Seq[ProductType], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
 
 @import helper._
+@import views.html.utils.alerts
 
-@flash.get("success").getOrElse("")
-<ul>
-@for(productType <- productTypes) {
-    <li>@productType.name
-        @form(routes.ProductTypeController.handleDelete()) {
-            @helper.CSRF.formField
-            <input type="hidden" name="id" value="@productType.productTypeId" >
-            <input type="submit" value="Delete" />
-        }
-    </li>
+@main("ProductTypes") {
+    @alerts()
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(productType <- productTypes) {
+            <tr>
+                <th scope="row">@productType.productTypeId</th>
+                <td>@productType.name</td>
+                <td>@productType.description.take(10)</td>
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary mr-2" href="/admin/productType/update/@productType.productTypeId">Edit</a>
+                        @form(routes.ProductTypeController.handleDelete()) {
+                            @helper.CSRF.formField
+                            <input type="hidden" name="id" value="@productType.productTypeId" >
+                            <input type="submit" value="Delete" class="btn btn-danger"/>
+                        }
+                    </div>
+                </td>
+                }
+        </tbody>
+    </table>
+} {
+    <a class="btn btn-success" href="/admin/productType/create">Add</a>
 }
-</ul>

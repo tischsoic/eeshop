@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 import models.DeleteForm.deleteForm
 import models.OrderStatus.OrderStatus
-import models.{Order, OrderStatus}
+import models.{Order, OrderItem, OrderStatus, Product, ProductType}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.Json
@@ -15,6 +15,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class OrderController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
   import dao.SQLiteOrdersComponent._
+  import dao.SQLiteOrderItemsComponent._
+  import dao.SQLiteProductsComponent._
   import dao.SQLiteUserComponent._
 
 //  case class Order(orderId: Int, customerId: Int, status: OrderStatus)
@@ -91,6 +93,35 @@ class OrderController @Inject()(cc: MessagesControllerComponents)(implicit ec: E
   }
 
   /////////////////////////////////////////////////////////////////
+
+  def addItem(productId: Int, quantity: Int, userId: Int) = Action.async {
+    OrdersRepository.getOrCreateCheckout(userId).flatMap({
+      case Some(order) => ProductsRepository.findById(productId).flatMap({
+        case Some(product) => OrderItemsRepository
+          .insert(OrderItem(0, order.orderId, productId, quantity, product.price)).map(_ => Ok("Item added"))
+        case None => Future.successful(NotFound("Product not found"))
+      })
+      case None => Future.successful(NotFound("Order not found"))
+    })
+  }
+
+  def getCheckout(userId: Int) = Action.async {
+    OrdersRepository.getOrCreateCheckout(userId).flatMap({
+      case Some(order) => OrderItemsRepository.getOrderItemsWithProduct(order.orderId).map(
+        (orderItemsWithProduct: Seq[(OrderItem, Product, ProductType)]) =>
+          Ok(Json.toJsObject(order) + ("items" -> orderItemsWithProductToJson(orderItemsWithProduct)))
+      )
+      case None => Future.successful(NotFound("Order not found"))
+    })
+  }
+
+  def orderItemsWithProductToJson(orderItemsWithProduct: Seq[(OrderItem, Product, ProductType)]) =
+    Json.toJson(orderItemsWithProduct.map({
+      case (orderItem: OrderItem, product: Product, productType: ProductType) =>
+        Json.toJsObject(orderItem) +
+          ("product" -> (Json.toJsObject(product) +
+            ("productType" -> Json.toJsObject(productType))))
+    }))
 
   def index = Action.async {
     OrdersRepository.all().map(r => Ok(Json.toJson(r)))

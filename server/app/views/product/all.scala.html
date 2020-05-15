@@ -1,16 +1,43 @@
 @(products: Seq[Product], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
 
 @import helper._
+@import views.html.utils.alerts
 
-@flash.get("success").getOrElse("")
-<ul>
-@for(product <- products) {
-    <li>@product.name
-        @form(routes.ProductController.handleDelete()) {
-            @helper.CSRF.formField
-            <input type="hidden" name="id" value="@product.productId" >
-            <input type="submit" value="Delete" />
-        }
-    </li>
+@main("Products") {
+    @alerts()
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Pr. Type Id</th>
+                <th scope="col">Price</th>
+                <th scope="col">Description</th>
+                <th scope="col">Quantity</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(product <- products) {
+            <tr>
+                <th scope="row">@product.productId</th>
+                <td>@product.productTypeId</td>
+                <td>@product.price</td>
+                <td>@product.description.take(10)</td>
+                <td>@product.quantity</td>
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary mr-2" href="/admin/product/update/@product.productId">Edit</a>
+                        @form(routes.ProductController.handleDelete()) {
+                            @helper.CSRF.formField
+                            <input type="hidden" name="id" value="@product.productId" >
+                            <input type="submit" value="Delete" class="btn btn-danger"/>
+                        }
+                    </div>
+                </td>
+                }
+        </tbody>
+    </table>
+} {
+    <a class="btn btn-success" href="/admin/product/create">Add</a>
 }
-</ul>

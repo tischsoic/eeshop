@@ -9,7 +9,7 @@
 @*    "message" -> nonEmptyText,*@
     <input type="hidden" name="faqNoteId" value="@faqNoteForm("faqNoteId").value" >
     @inputText(faqNoteForm("title"))
-    @inputText(faqNoteForm("message"))
+    @textarea(faqNoteForm("message"))
 
     <input type="submit" value="@submitBtnLabel" />
 }

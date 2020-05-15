@@ -1,17 +1,41 @@
 @(invoices: Seq[Invoice], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
 
 @import helper._
+@import views.html.utils.alerts
 
-@flash.get("success").getOrElse("")
-<ul>
-@for(invoice <- invoices) {
-    <li>@invoice.invoiceId <br>
-        @invoice.totalCost
-        @form(routes.InvoiceController.handleDelete()) {
-            @helper.CSRF.formField
-            <input type="hidden" name="id" value="@invoice.invoiceId" >
-            <input type="submit" value="Delete" />
-        }
-    </li>
+@main("Invoices") {
+    @alerts()
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Order Id</th>
+                <th scope="col">Total Cost</th>
+                <th scope="col">Date</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(invoice <- invoices) {
+            <tr>
+                <th scope="row">@invoice.invoiceId</th>
+                <td>@invoice.orderId</td>
+                <td>@invoice.totalCost</td>
+                <td>@invoice.date</td>
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary mr-2" href="/admin/invoice/update/@invoice.invoiceId">Edit</a>
+                        @form(routes.InvoiceController.handleDelete()) {
+                            @helper.CSRF.formField
+                            <input type="hidden" name="id" value="@invoice.invoiceId" >
+                            <input type="submit" value="Delete" class="btn btn-danger"/>
+                        }
+                    </div>
+                </td>
+                }
+        </tbody>
+    </table>
+} {
+    <a class="btn btn-success" href="/admin/invoice/create">Add</a>
 }
-</ul>

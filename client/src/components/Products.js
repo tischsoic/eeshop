@@ -1,36 +1,39 @@
 import React, { useState, useEffect } from 'react';
+import { getRequestInit, getUrl } from '../utils/requestUtils';
+import { Link } from 'react-router-dom';
+
+import Card from './Card';
 
 export default function Products() {
   const [products, setProducts] = useState(null);
   const [error, setError] = useState(null);
+  const isFetchingData = !products;
 
   useEffect(() => {
-    fetch('http://localhost:9000/product', {
-      mode: 'cors',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'http://localhost:3000',
-      },
-      method: 'GET',
-    })
+    fetch(getUrl(`product`), getRequestInit({ method: 'GET' }))
       .then((response) => response.json())
-      .then((products) => setProducts(products))
-      .catch((error) => setError('Error while fetching products'));
+      .then((fetchedProducts) => setProducts(fetchedProducts))
+      .catch(() => setError('Error while fetching products'));
   }, [setProducts]);
 
-  console.log(products)
+  console.log(products);
 
   return (
-    <div className="product">
-      {error && <div className="error">{error}</div>}
-      {products && (
-        <div className="list">
-          {products.map((product) => (
-            <div key={product.productId}>{product.name}</div>
-          ))}
-        </div>
-      )}
-    </div>
+    <Card title="Products" isLoading={isFetchingData} error={error}>
+      <div className="products">
+        <ul className="list-group">
+          {products &&
+            products.map((product) => (
+              <Link
+                to={`/product/${product.productId}`}
+                key={product.productId}
+                className="list-group-item"
+              >
+                {product.name}
+              </Link>
+            ))}
+        </ul>
+      </div>
+    </Card>
   );
 }

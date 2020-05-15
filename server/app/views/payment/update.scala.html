@@ -1,10 +1,11 @@
 @(paymentForm: Form[Payment], invoices: Seq[Invoice])(implicit request: MessagesRequestHeader, flash: Flash)
 
 @import views.html.payment.paymentCommonForm
+@import views.html.utils.alerts
 
 @title = @{"Update payment"}
 
 @main(title) {
-    @flash.get("success").getOrElse("")
+    @alerts()
     @paymentCommonForm(paymentForm, invoices, routes.PaymentController.handleUpdate(), title)
 }

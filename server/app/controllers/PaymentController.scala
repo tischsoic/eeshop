@@ -5,21 +5,22 @@ import java.time.LocalDate
 
 import javax.inject._
 import models.DeleteForm.deleteForm
-import models.Payment
+import models.{OrderStatus, Payment}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.Json
 import play.api.mvc._
-import utils.FormUtils.priceConstraint
 import utils.DoubleImplicits._
+import utils.FormUtils.priceConstraint
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PaymentController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
-  import dao.SQLitePaymentsComponent._
   import dao.SQLiteInvoicesComponent._
+  import dao.SQLiteOrdersComponent._
+  import dao.SQLitePaymentsComponent._
 
 //  case class Payment(paymentId: Int, invoiceId: Int, date: Date, sum: Double)
   val paymentForm: Form[Payment] = Form {
@@ -92,6 +93,19 @@ class PaymentController @Inject()(cc: MessagesControllerComponents)(implicit ec:
   }
 
   /////////////////////////////////////////////////////////////////
+
+  def payInvoice(invoiceId: Int) = Action.async {
+    InvoicesRepository.findById(invoiceId).flatMap({
+      case Some(invoice) =>
+        PaymentsRepository
+          .insertWithReturn(Payment(0, invoiceId, Date.valueOf(LocalDate.now()), invoice.totalCost))
+          .flatMap(payment => OrdersRepository.updateStatus(invoice.orderId, OrderStatus.Pack).map(
+            _ => Ok(Json.toJsObject(payment))
+          )
+      )
+      case None => Future.successful(NotFound("Invoice not found"))
+    })
+  }
 
   def index = Action.async {
     PaymentsRepository.all().map(r => Ok(Json.toJson(r)))

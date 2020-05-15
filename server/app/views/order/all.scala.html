@@ -1,16 +1,37 @@
 @(orders: Seq[Order], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
 
 @import helper._
+@import views.html.utils.alerts
 
-@flash.get("success").getOrElse("")
-<ul>
-@for(order <- orders) {
-    <li>@order.orderId
-        @form(routes.OrderController.handleDelete()) {
-            @helper.CSRF.formField
-            <input type="hidden" name="id" value="@order.orderId" >
-            <input type="submit" value="Delete" />
-        }
-    </li>
+@main("Orders") {
+    @alerts()
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Customer Id</th>
+                <th scope="col">Status</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(order <- orders) {
+            <tr>
+                <th scope="row">@order.orderId</th>
+                <td>@order.customerId</td>
+                <td>@order.status</td>
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary mr-2" href="/admin/order/update/@order.orderId">Edit</a>
+                        @form(routes.OrderController.handleDelete()) {
+                            @helper.CSRF.formField
+                            <input type="hidden" name="id" value="@order.orderId" >
+                            <input type="submit" value="Delete" class="btn btn-danger"/>
+                        }
+                    </div>
+                </td>
+                }
+        </tbody>
+    </table>
 }
-</ul>

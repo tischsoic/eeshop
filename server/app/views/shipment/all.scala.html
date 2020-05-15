@@ -1,16 +1,41 @@
 @(shipments: Seq[Shipment], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
 
 @import helper._
+@import views.html.utils.alerts
 
-@flash.get("success").getOrElse("")
-<ul>
-@for(shipment <- shipments) {
-    <li>@shipment.shipmentId
-        @form(routes.ShipmentController.handleDelete()) {
-            @helper.CSRF.formField
-            <input type="hidden" name="id" value="@shipment.shipmentId" >
-            <input type="submit" value="Delete" />
-        }
-    </li>
+@main("Shipments") {
+    @alerts()
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Order Id</th>
+                <th scope="col">Date</th>
+                <th scope="col">Tracking Code</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(shipment <- shipments) {
+            <tr>
+                <th scope="row">@shipment.shipmentId</th>
+                <td>@shipment.orderId</td>
+                <td>@shipment.date</td>
+                <td>@shipment.trackingCode</td>
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary mr-2" href="/admin/shipment/update/@shipment.shipmentId">Edit</a>
+                        @form(routes.ShipmentController.handleDelete()) {
+                            @helper.CSRF.formField
+                            <input type="hidden" name="id" value="@shipment.shipmentId" >
+                            <input type="submit" value="Delete" class="btn btn-danger"/>
+                        }
+                    </div>
+                </td>
+                }
+        </tbody>
+    </table>
+} {
+    <a class="btn btn-success" href="/admin/shipment/create">Add</a>
 }
-</ul>

@@ -1,0 +1,12 @@
+@(body: Html, title: String, headerButtons: Html)
+
+<div class="card mb-3">
+    <div class="card-header">
+        <div class=" d-flex justify-content-between">
+            <h3 class="mb-0">@title</h3>
+            <div class="btn-group" role="group">@headerButtons</div>
+        </div>
+    </div>
+    <div class="card-body">@body</div>
+</div>
+

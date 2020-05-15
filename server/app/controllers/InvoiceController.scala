@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 import javax.inject._
 import models.DeleteForm.deleteForm
-import models.Invoice
+import models.{Invoice, OrderItem, ProductType}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.Json
@@ -20,6 +20,7 @@ class InvoiceController @Inject()(cc: MessagesControllerComponents)(implicit ec:
   extends MessagesAbstractController(cc) {
   import dao.SQLiteInvoicesComponent._
   import dao.SQLiteOrdersComponent._
+  import dao.SQLiteOrderItemsComponent._
 
 //  case class Invoice(invoiceId: Int, orderId: Int, totalCost: Double, date: Date)
   val invoiceForm: Form[Invoice] = Form {
@@ -96,6 +97,22 @@ class InvoiceController @Inject()(cc: MessagesControllerComponents)(implicit ec:
   }
 
   /////////////////////////////////////////////////////////////////
+
+  def createForOrder(orderId: Int) = Action.async {
+    OrdersRepository.findById(orderId).flatMap({
+      case Some(order) => OrderItemsRepository.getOrderItemsWithProduct(order.orderId).flatMap(
+        (orderItemsWithProduct: Seq[(OrderItem, Product, ProductType)]) => {
+          val totalPrice = orderItemsWithProduct.foldLeft(0.0)(
+            { case (totalPrice, (orderItem, _, _)) => totalPrice + orderItem.quantity * orderItem.price})
+
+          InvoicesRepository.insertWithReturn(Invoice(0, orderId, totalPrice, Date.valueOf(LocalDate.now()))).map(
+            invoice => Ok(Json.toJsObject(invoice))
+          )
+        }
+      )
+      case None => Future.successful(NotFound("Order not found"))
+    })
+  }
 
   def index = Action.async {
     InvoicesRepository.all().map(r => Ok(Json.toJson(r)))

@@ -1,10 +1,11 @@
 @(productForm: Form[Product], productTypes: Seq[ProductType])(implicit request: MessagesRequestHeader, flash: Flash)
 
 @import views.html.product.productCommonForm
+@import views.html.utils.alerts
 
 @title = @{"Update product"}
 
 @main(title) {
-    @flash.get("success").getOrElse("")
+    @alerts()
     @productCommonForm(productForm, productTypes, routes.ProductController.handleUpdate(), title)
 }

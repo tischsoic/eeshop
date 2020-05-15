@@ -13,5 +13,13 @@ trait ProductsComponent extends Tables { this: DatabaseComponent with ProfileCom
     val table = Products
     def getId(table: ProductsTable) = table.productId
     def setId(product: Product, id: Id) = product.copy(productId = id)
+
+    def getProduct(productId: Id) = {
+      val query = for {
+        (product, productType) <- table filter (getId(_) === productId) joinLeft ProductTypes on (_.productTypeId === _.productTypeId)
+      } yield (product, productType)
+
+      db.run(query.result.headOption)
+    }
   }
 }

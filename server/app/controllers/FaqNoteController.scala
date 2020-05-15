@@ -84,6 +84,10 @@ class FaqNoteController @Inject()(cc: MessagesControllerComponents)(implicit ec:
 
   /////////////////////////////////////////////////////////////////
 
+  def getFaqNotes = Action.async {
+    FaqNotesRepository.all().map(r => Ok(Json.toJson(r)))
+  }
+
   def index = Action.async {
     FaqNotesRepository.all().map(r => Ok(Json.toJson(r)))
   }

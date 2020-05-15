@@ -1,6 +1,5 @@
 package controllers
 
-
 import javax.inject._
 import models.DeleteForm.deleteForm
 import models.Product
@@ -93,7 +92,14 @@ class ProductController @Inject()(cc: MessagesControllerComponents)(implicit ec:
 
   /////////////////////////////////////////////////////////////////
 
-  def index = Action.async {
+  def getProduct(productId: Int) = Action.async {
+    ProductsRepository.getProduct(productId).map {
+      case Some((product, Some(productType))) => Ok(Json.toJsObject(product) + ("productType" -> Json.toJson(productType)))
+      case None => NotFound("No such product")
+    }
+  }
+
+  def getProducts = Action.async {
     ProductsRepository.all().map(r => Ok(Json.toJson(r)))
   }
 

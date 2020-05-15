@@ -1,10 +1,11 @@
 @(invoiceForm: Form[Invoice], orders: Seq[Order])(implicit request: MessagesRequestHeader, flash: Flash)
 
 @import views.html.invoice.invoiceCommonForm
+@import views.html.utils.alerts
 
 @title = @{"Update invoice"}
 
 @main(title) {
-    @flash.get("success").getOrElse("")
+    @alerts()
     @invoiceCommonForm(invoiceForm, orders, routes.InvoiceController.handleUpdate(), title)
 }
