@@ -12,7 +12,12 @@ export default function OauthButton({ provider, title }) {
         `${getUrl(`auth/${provider}`)}?${queryParams}`,
         getRequestInit({ method: 'GET' })
       )
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.status >= 400 && response.status < 600) {
+            throw new Error('Bad response from server');
+          }
+          return response.json();
+        })
         .then((fetchedUser) => {
           console.log(fetchedUser);
           setUser(fetchedUser);

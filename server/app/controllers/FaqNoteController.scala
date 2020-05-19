@@ -3,13 +3,14 @@ package controllers
 import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject._
 import models.DeleteForm.deleteForm
-import models.FaqNote
+import models.{FaqNote, UserRole}
 import models.services.AuthenticateService
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.Json
 import play.api.mvc._
 import utils.DefaultEnv
+import utils.auth.HasRole
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -90,7 +91,7 @@ class FaqNoteController @Inject()(
 
   /////////////////////////////////////////////////////////////////
 
-  def getFaqNotes = silhouette.SecuredAction.async {
+  def getFaqNotes = silhouette.SecuredAction(HasRole(UserRole.Staff)).async {
     FaqNotesRepository.all().map(r => Ok(Json.toJson(r)))
   }
 

@@ -100,7 +100,7 @@ class AuthController @Inject()(
       case Left(result) => Future.successful(result)
       case Right(authInfo) => for {
         profile <- p.retrieveProfile(authInfo)
-        userBindResult <- authenticateService.provideUserForSocialAccount("google", profile, authInfo)
+        userBindResult <- authenticateService.provideUserForSocialAccount(provider, profile, authInfo)
         result <- userBindResult match {
           case AccountBound(u) =>
             authenticateUser(u, profile.loginInfo, rememberMe = true)

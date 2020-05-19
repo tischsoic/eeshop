@@ -20,7 +20,8 @@ class UserServiceImpl @Inject()()(implicit ec: ExecutionContext) extends UserSer
    * @return The retrieved user or None if no user could be retrieved for the given login info.
    */
   def retrieve(loginInfo: LoginInfo): Future[Option[User]] =
-    Future.successful(Some(User(0, "em", "a", "b", "pass", UserRole.Customer)))
+    UserRepository.find(loginInfo)
+//    Future.successful(Some(User(0, "em", "a", "b", "pass", UserRole.Customer)))
 
   /**
    * Retrieves a user and login info pair by userID and login info providerID
