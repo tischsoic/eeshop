@@ -339,22 +339,22 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
 //  }
 
 
-//  /**
-//   * Provides the Facebook provider.
-//   *
-//   * @param httpLayer          The HTTP layer implementation.
-//   * @param socialStateHandler The social state handler implementation.
-//   * @param configuration      The Play configuration.
-//   * @return The Facebook provider.
-//   */
-//  @Provides
-//  def provideFacebookProvider(
-//                               httpLayer: HTTPLayer,
-//                               socialStateHandler: SocialStateHandler,
-//                               configuration: Configuration): FacebookProvider = {
-//
-//    new FacebookProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.facebook"))
-//  }
+  /**
+   * Provides the Facebook provider.
+   *
+   * @param httpLayer          The HTTP layer implementation.
+   * @param socialStateHandler The social state handler implementation.
+   * @param configuration      The Play configuration.
+   * @return The Facebook provider.
+   */
+  @Provides
+  def provideFacebookProvider(
+                               httpLayer: HTTPLayer,
+                               socialStateHandler: SocialStateHandler,
+                               configuration: Configuration): FacebookProvider = {
+
+    new FacebookProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.facebook"))
+  }
 
   /**
    * Provides the Google provider.

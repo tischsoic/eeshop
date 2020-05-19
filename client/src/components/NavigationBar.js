@@ -41,7 +41,8 @@ export default function NavigationBar() {
           FAQ
         </NavLink>
       </div>
-      <OauthButton provider="google" />
+      <OauthButton provider="google" title="Google login" />
+      <OauthButton provider="facebook" title="FB login" />
       <button
         className="btn btn-outline-danger my-2 my-sm-0"
         type="button"

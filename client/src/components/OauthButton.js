@@ -4,18 +4,18 @@ import { UserContext } from '../providers/UserProvider';
 
 let existingWindow = null;
 
-export default function OauthButton({ provider }) {
+export default function OauthButton({ provider, title }) {
   const { setUser } = useContext(UserContext);
   function handleAuthentication() {
     window.socialProviderCallback = function (provider, queryParams) {
       fetch(
-        `${getUrl('auth')}?${queryParams}`,
+        `${getUrl(`auth/${provider}`)}?${queryParams}`,
         getRequestInit({ method: 'GET' })
       )
         .then((response) => response.json())
         .then((fetchedUser) => {
           console.log(fetchedUser);
-          setUser(fetchedUser)
+          setUser(fetchedUser);
         })
         .catch(function (response) {
           console.log('Error on social auth');
@@ -49,7 +49,7 @@ export default function OauthButton({ provider }) {
     const left = (width - w) / 2 / systemZoom + dualScreenLeft;
     const top = (height - h) / 2 / systemZoom + dualScreenTop;
     existingWindow = window.open(
-      '/api/auth',
+      `/api/auth/${provider}`,
       'Authentication',
       'scrollbars=yes, width=' +
         w / systemZoom +
@@ -68,7 +68,7 @@ export default function OauthButton({ provider }) {
       className="btn btn-primary"
       onClick={handleAuthentication}
     >
-      Google Auth
+      {title}
     </button>
   );
 }

@@ -163,7 +163,7 @@ GET     /api/product/:productId     controllers.ProductController.getProduct(pro
 
 ########################
 
-GET     /api/auth                   controllers.AuthController.auth
+GET     /api/auth/:provider         controllers.AuthController.auth(provider: String)
 
 
 GET     /$any<.*>                   controllers.ApplicationController.reactApp(any)

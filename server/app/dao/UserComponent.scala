@@ -54,10 +54,10 @@ trait UserComponent extends Tables { this: DatabaseComponent with ProfileCompone
      * @return The saved user.
      */
     def save(user: User)(implicit ec: ExecutionContext): Future[User] = {
-      val a: Future[Option[User]] = db.run((Users returning Users).insertOrUpdate(user))
+      val a: Future[Option[Int]] = db.run((Users returning Users.map(_.userId)).insertOrUpdate(user))
       a.map({
         case None => user
-        case Some(user) => user
+        case Some(userId) => user.copy(userId = userId)
       })
     }
 

@@ -5,6 +5,7 @@ import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AuthenticatorResult
 import com.mohiva.play.silhouette.api.util.{Clock, PlayHTTPLayer}
 import com.mohiva.play.silhouette.crypto.{JcaSigner, JcaSignerSettings}
+import com.mohiva.play.silhouette.impl.providers.oauth2.FacebookProvider
 import com.mohiva.play.silhouette.impl.providers.state.{CsrfStateItemHandler, CsrfStateSettings}
 import com.mohiva.play.silhouette.impl.providers.{DefaultSocialStateHandler, OAuth2Settings, SocialProviderRegistry}
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
@@ -44,7 +45,8 @@ class AuthController @Inject()(
                                 authenticateService: AuthenticateService,
                                 authInfoRepository: AuthInfoRepository,
 //                                socialProviderRegistry: SocialProviderRegistry,
-                                p: GoogleProvider)
+                                gp: GoogleProvider,
+                                fp: FacebookProvider)
                               (implicit ec: ExecutionContext) extends MessagesAbstractController(cc) {
 
   import dao.SQLiteOrderItemsComponent._
@@ -88,7 +90,12 @@ class AuthController @Inject()(
 //
 //  }
 
-  def auth() = Action.async { implicit request: Request[AnyContent] =>
+  def auth(provider: String) = Action.async { implicit request: Request[AnyContent] =>
+    val p = provider match {
+      case "google" => gp
+      case "facebook" => fp
+    }
+
     p.authenticate().flatMap {
       case Left(result) => Future.successful(result)
       case Right(authInfo) => for {
