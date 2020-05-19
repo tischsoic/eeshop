@@ -5,7 +5,7 @@ import slick.jdbc.JdbcProfile
 import slick.jdbc.JdbcBackend.Database
 import slick.lifted.AbstractTable
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 abstract class Repository[T <: AbstractTable[_], I: BaseTypedType](val profile: JdbcProfile, val db: Database) {
   import profile.api._

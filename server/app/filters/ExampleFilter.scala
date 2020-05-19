@@ -20,6 +20,7 @@ class ExampleFilter @Inject()(
     implicit override val mat: Materializer,
     exec: ExecutionContext) extends Filter {
 
+  // TODO: CSRF filter??? https://github.com/SunPj/silhouette-vuejs-app/blob/master/app/utils/Filters.scala
   override def apply(nextFilter: RequestHeader => Future[Result])
            (requestHeader: RequestHeader): Future[Result] = {
     // Run the next filter in the chain. This will call other filters

@@ -9,6 +9,38 @@ CREATE TABLE "users" (
 	role TEXT CHECK( role IN ('staff', 'customer') ) NOT NULL
 );
 
+CREATE TABLE "login_info" (
+    id           INTEGER PRIMARY KEY,
+    provider_id  TEXT,
+    provider_key TEXT
+);
+
+CREATE TABLE "user_login_info" (
+    user_id       INTEGER NOT NULL,
+    login_info_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id)
+        REFERENCES users (user_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    FOREIGN KEY (login_info_id)
+        REFERENCES login_info (id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+
+CREATE TABLE "oauth2_info" (
+    id            INTEGER PRIMARY KEY,
+    access_token  TEXT NOT NULL,
+    token_type    TEXT,
+    expires_in    INTEGER,
+    refresh_token TEXT,
+    login_info_id INTEGER NOT NULL,
+    FOREIGN KEY (login_info_id)
+        REFERENCES login_info (id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+
 CREATE TABLE "product_types" (
     product_type_id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,

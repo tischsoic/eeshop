@@ -159,3 +159,11 @@ POST    /api/payment/:invoiceId     controllers.PaymentController.payInvoice(inv
 
 GET     /api/product                controllers.ProductController.getProducts
 GET     /api/product/:productId     controllers.ProductController.getProduct(productId: Int)
+
+
+########################
+
+GET     /api/auth                   controllers.AuthController.auth
+
+
+GET     /$any<.*>                   controllers.ApplicationController.reactApp(any)

@@ -2,6 +2,7 @@ package models
 
 import java.sql.Date
 
+import com.mohiva.play.silhouette.api.{Identity, LoginInfo}
 import models.OrderStatus.OrderStatus
 import models.UserRole.UserRole
 import play.api.data.FormError
@@ -9,7 +10,7 @@ import play.api.data.format.Formatter
 import play.api.libs.json._
 import utils.EnumUtils
 
-case class User(userId: Int, email: String, firstName: String, lastName: String, password: String, role: UserRole)
+case class User(userId: Int, email: String, firstName: String, lastName: String, password: String, role: UserRole) extends Identity
 case class ProductType(productTypeId: Int, name: String, description: String)
 case class Product(productId: Int, productTypeId: Int, name: String, price: Double, description: String, quantity: Int)
 case class Order(orderId: Int, customerId: Int, status: OrderStatus)
@@ -19,6 +20,26 @@ case class Payment(paymentId: Int, invoiceId: Int, date: Date, sum: Double)
 case class Shipment(shipmentId: Int, orderId: Int, date: Date, trackingCode: String)
 case class Review(reviewId: Int, productId: Int, authorId: Int, content: String)
 case class FaqNote(faqNoteId: Int, title: String, message: String)
+
+case class DBOAuth2Info(
+                         id: Option[Int],
+                         accessToken: String,
+                         tokenType: Option[String],
+                         expiresIn: Option[Int],
+                         refreshToken: Option[String],
+                         loginInfoId: Int
+                       )
+
+case class DBLoginInfo(id: Option[Int], providerID: String, providerKey: String)
+object DBLoginInfo {
+  def fromLoginInfo(loginInfo: LoginInfo): DBLoginInfo = DBLoginInfo(None, loginInfo.providerID, loginInfo.providerKey)
+  def toLoginInfo(dbLoginInfo: DBLoginInfo) = LoginInfo(dbLoginInfo.providerID, dbLoginInfo.providerKey)
+}
+
+case class DBUserLoginInfo(
+                            userID: Int,
+                            loginInfoId: Int
+                          )
 
 object UserRole extends Enumeration {
   type UserRole = Value
@@ -63,6 +84,9 @@ object OrderStatus extends Enumeration {
 object User {
   implicit val userJsonFormat = Json.format[User]
   def tupled = (this.apply _).tupled
+
+//  def toUser(u: DBUser): User = User(u.userID, u.firstName, u.lastName, u.email, u.avatarURL, u.activated, UserRoles(u.roleId))
+//  def fromUser(u: User): DBUser = DBUser(u.userID, u.firstName, u.lastName, u.email, u.avatarURL, u.activated, u.role.id, ZonedDateTime.now)
 }
 
 object ProductType {

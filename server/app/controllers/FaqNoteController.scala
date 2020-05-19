@@ -1,17 +1,23 @@
 package controllers
 
+import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject._
 import models.DeleteForm.deleteForm
 import models.FaqNote
+import models.services.AuthenticateService
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.Json
 import play.api.mvc._
+import utils.DefaultEnv
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FaqNoteController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
+class FaqNoteController @Inject()(
+                                   silhouette: Silhouette[DefaultEnv],
+                                   authenticateService: AuthenticateService,
+                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
   import dao.SQLiteFaqNotesComponent._
 
@@ -84,7 +90,7 @@ class FaqNoteController @Inject()(cc: MessagesControllerComponents)(implicit ec:
 
   /////////////////////////////////////////////////////////////////
 
-  def getFaqNotes = Action.async {
+  def getFaqNotes = silhouette.SecuredAction.async {
     FaqNotesRepository.all().map(r => Ok(Json.toJson(r)))
   }
 

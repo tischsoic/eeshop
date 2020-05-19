@@ -3,6 +3,7 @@ package dao
 import java.sql.Date
 import java.text.SimpleDateFormat
 
+import com.mohiva.play.silhouette.api.LoginInfo
 import models.OrderStatus.OrderStatus
 import models._
 import models.UserRole.UserRole
@@ -21,6 +22,10 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   lazy val Shipments = TableQuery[ShipmentsTable]
   lazy val Reviews = TableQuery[ReviewsTable]
   lazy val FaqNotes = TableQuery[FaqNotesTable]
+
+  lazy val OAuth2Infos = TableQuery[OAuth2InfosTable]
+  lazy val LoginInfos = TableQuery[LoginInfosTable]
+  lazy val UserLoginInfos = TableQuery[UserLoginInfosTable]
 
   val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
   // lazy because otherwise MappedColumnType is null:
@@ -158,5 +163,36 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
 
     def * = (faqNoteId, title, message) <> (FaqNote.tupled, FaqNote.unapply)
   }
+
+  class OAuth2InfosTable(tag: Tag) extends Table[DBOAuth2Info](tag, "oauth2_info") {
+    def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    def accessToken = column[String]("access_token")
+    def tokenType = column[Option[String]]("token_type")
+    def expiresIn = column[Option[Int]]("expires_in")
+    def refreshToken = column[Option[String]]("refresh_token")
+    def loginInfoId = column[Int]("login_info_id")
+
+    def * = (id.?, accessToken, tokenType, expiresIn, refreshToken, loginInfoId) <> (DBOAuth2Info.tupled, DBOAuth2Info.unapply)
+
+    def loginInfo =
+      foreignKey("login_info_id", loginInfoId, LoginInfos)(_.id, onUpdate=ForeignKeyAction.Cascade, onDelete=ForeignKeyAction.SetNull)
+  }
+
+  class LoginInfosTable(tag: Tag) extends Table[DBLoginInfo](tag, "login_info") {
+    def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    def providerID = column[String]("provider_id")
+    def providerKey = column[String]("provider_key")
+
+    def * = (id.?, providerID, providerKey) <> ((DBLoginInfo.apply _).tupled, DBLoginInfo.unapply)
+  }
+
+  class UserLoginInfosTable(tag: Tag) extends Table[DBUserLoginInfo](tag, "user_login_info") {
+    def userID = column[Int]("user_id")
+    def loginInfoId = column[Int]("login_info_id")
+    def * = (userID, loginInfoId) <> (DBUserLoginInfo.tupled, DBUserLoginInfo.unapply)
+  }
+
+  def loginInfoQuery(loginInfo: LoginInfo) =
+    LoginInfos.filter(dbLoginInfo => dbLoginInfo.providerID === loginInfo.providerID && dbLoginInfo.providerKey === loginInfo.providerKey)
 
 }
