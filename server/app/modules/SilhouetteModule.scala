@@ -19,7 +19,7 @@ import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
 import com.mohiva.play.silhouette.password.{BCryptPasswordHasher, BCryptSha256PasswordHasher}
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
-import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
+import com.mohiva.play.silhouette.persistence.repositories.{CacheAuthenticatorRepository, DelegableAuthInfoRepository}
 import com.typesafe.config.Config
 import dao.OAuth2InfoDAO
 import models.services.{UserService, UserServiceImpl}
@@ -249,12 +249,14 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   def provideAuthenticatorService(@Named("authenticator-crypter") crypter: Crypter,
                                   idGenerator: IDGenerator,
                                   configuration: Configuration,
-                                  clock: Clock): AuthenticatorService[JWTAuthenticator] = {
+                                  clock: Clock,
+                                  cacheLayer: CacheLayer): AuthenticatorService[JWTAuthenticator] = {
 
     val config = configuration.underlying.as[JWTAuthenticatorSettings]("silhouette.authenticator")
     val encoder = new CrypterAuthenticatorEncoder(crypter)
 
-    new JWTAuthenticatorService(config, None, encoder, idGenerator, clock)
+    new JWTAuthenticatorService(config, Some(new CacheAuthenticatorRepository[JWTAuthenticator](cacheLayer)), encoder, idGenerator, clock)
+//    new JWTAuthenticatorService(config, None, encoder, idGenerator, clock)
   }
 
   /**

@@ -6,7 +6,7 @@ import { UserContext } from '../providers/UserProvider';
 import Card from './Card';
 
 export default function Faq() {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const token = user ? user.token : '';
   const [faqNotes, setFaqNotes] = useState(null);
   const [error, setError] = useState(null);
@@ -15,7 +15,8 @@ export default function Faq() {
   useEffect(() => {
     fetch(getUrl('faqNote'), getRequestInit({ method: 'GET' }, token))
       .then((response) => {
-        if (response.status >= 400 && response.status < 600) {
+        if (response.status >= 400 && response.status < 500) {
+          setUser(null);
           throw new Error('Bad response from server');
         }
         return response.json();

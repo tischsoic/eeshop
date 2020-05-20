@@ -1,6 +1,7 @@
 package controllers
 
-import com.mohiva.play.silhouette.api.{LoginEvent, LoginInfo, Silhouette}
+import com.mohiva.play.silhouette.api.actions.SecuredRequest
+import com.mohiva.play.silhouette.api.{LoginEvent, LoginInfo, LogoutEvent, Silhouette}
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AuthenticatorResult
 import com.mohiva.play.silhouette.api.util.{Clock, PlayHTTPLayer}
@@ -130,5 +131,9 @@ class AuthController @Inject()(
     }
   }
 
+  def signOut = silhouette.SecuredAction.async { implicit request: SecuredRequest[DefaultEnv, AnyContent] =>
+    silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
+    silhouette.env.authenticatorService.discard(request.authenticator, Ok)
+  }
 
 }

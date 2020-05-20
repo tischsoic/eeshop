@@ -1,12 +1,18 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
+import { getUrl, getRequestInit } from '../utils/requestUtils';
 
 import { UserContext } from '../providers/UserProvider';
 import OauthButton from './OauthButton';
 
 export default function NavigationBar() {
-  const user = useContext(UserContext);
-  const signOut = () => {};
+  const { user, setUser } = useContext(UserContext);
+  const signOut = () => {
+    const token = user ? user.token : '';
+
+    fetch(getUrl('sign-out'), getRequestInit({ method: 'GET' }, token));
+    setUser(null);
+  };
 
   return (
     <nav className="navbar navbar-expand navbar-light bg-light justify-content-between mb-5 px-5">

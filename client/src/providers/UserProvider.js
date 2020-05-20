@@ -9,7 +9,12 @@ export default function UserProvider({ children }) {
     return userString ? JSON.parse(userString) : null;
   });
   function handleSetUser(user) {
-    window.localStorage.setItem('eeshop-user', JSON.stringify(user));
+    if (user) {
+      window.localStorage.setItem('eeshop-user', JSON.stringify(user));
+    } else {
+      window.localStorage.removeItem('eeshop-user');
+    }
+
     setUser(user);
   }
 
