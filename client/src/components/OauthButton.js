@@ -43,12 +43,12 @@ export default function OauthButton({ provider, title }) {
       ? window.innerWidth
       : document.documentElement.clientWidth
       ? document.documentElement.clientWidth
-      : screen.width;
+      : window.screen.width;
     const height = window.innerHeight
       ? window.innerHeight
       : document.documentElement.clientHeight
       ? document.documentElement.clientHeight
-      : screen.height;
+      : window.screen.height;
 
     const systemZoom = width / window.screen.availWidth;
     const left = (width - w) / 2 / systemZoom + dualScreenLeft;
@@ -70,7 +70,7 @@ export default function OauthButton({ provider, title }) {
   return (
     <button
       type="button"
-      className="btn btn-primary"
+      className="btn btn-primary mr-2"
       onClick={handleAuthentication}
     >
       {title}
