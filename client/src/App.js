@@ -9,14 +9,18 @@ import './App.css';
 
 import UserProvider from './providers/UserProvider';
 
-import Products from './components/Products';
-import Product from './components/Product';
+import ProductsCard from './components/ProductsCard';
+import ProductCard from './components/ProductCard';
 import Checkout from './components/Checkout';
 import Panel from './components/Panel';
 import Orders from './components/Orders';
 import Faq from './components/Faq';
 import Oauth from './components/Oauth';
 import FaqEdit from './components/FaqEdit';
+import ProductTypeEdit from './components/ProductTypeEdit';
+import ProductType from './components/ProductType';
+import Product from './components/Product';
+import ProductEdit from './components/ProductEdit';
 
 function App() {
   return (
@@ -27,13 +31,13 @@ function App() {
             <Panel>
               <Switch>
                 <Route path="/" exact>
-                  <Products />
+                  <ProductsCard />
                 </Route>
                 <Route path="/oauth/:provider">
                   <Oauth />
                 </Route>
-                <Route path="/product/:productId">
-                  <Product />
+                <Route path="/productCard/:productId">
+                  <ProductCard />
                 </Route>
                 <Route path="/orders">
                   <Orders />
@@ -46,6 +50,18 @@ function App() {
                 </Route>
                 <Route path="/faq">
                   <Faq />
+                </Route>
+                <Route path="/product/edit/:id?">
+                  <ProductEdit />
+                </Route>
+                <Route path="/product">
+                  <Product />
+                </Route>
+                <Route path="/productType/edit/:id?">
+                  <ProductTypeEdit />
+                </Route>
+                <Route path="/productType">
+                  <ProductType />
                 </Route>
                 <Route render={() => <Redirect to="/" />} />
               </Switch>

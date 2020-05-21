@@ -1,20 +1,27 @@
 package controllers
 
+import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject._
 import models.DeleteForm.deleteForm
-import models.Product
+import models.{Product, UserRole}
+import models.services.AuthenticateService
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import utils.DefaultEnv
 import utils.FormUtils.priceConstraint
 import utils.DoubleImplicits._
+import utils.auth.HasRole
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ProductController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
+class ProductController @Inject()(silhouette: Silhouette[DefaultEnv],
+                                  authenticateService: AuthenticateService,
+                                  cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
+
   import dao.SQLiteProductsComponent._
   import dao.SQLiteProductTypesComponent._
 
@@ -92,28 +99,46 @@ class ProductController @Inject()(cc: MessagesControllerComponents)(implicit ec:
 
   /////////////////////////////////////////////////////////////////
 
-  def getProduct(productId: Int) = Action.async {
-    ProductsRepository.getProduct(productId).map {
-      case Some((product, Some(productType))) => Ok(Json.toJsObject(product) + ("productType" -> Json.toJson(productType)))
-      case None => NotFound("No such product")
+  private def getProductFromRequest(request: Request[JsValue], id: Int = 0): Product = {
+    val productTypeId = (request.body \ "productTypeId").as[Int]
+    val name = (request.body \ "name").as[String]
+    val price = (request.body \ "price").as[Double]
+    val description = (request.body \ "description").as[String]
+    val quantity = (request.body \ "quantity").as[Int]
+
+    Product(id, productTypeId, name, price, description, quantity)
+  }
+
+  def create_REST =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      ProductsRepository
+        .insertWithReturn(getProductFromRequest(request))
+        .map(product => Ok(Json.toJson(product)))
     }
-  }
 
-  def getProducts = Action.async {
-    ProductsRepository.all().map(r => Ok(Json.toJson(r)))
-  }
+  def read_REST(id: Int) =
+    Action.async { implicit request: Request[AnyContent] =>
+      ProductsRepository.getProduct(id).map {
+        case Some((product, Some(productType))) => Ok(Json.toJsObject(product) + ("productType" -> Json.toJson(productType)))
+        case None => NotFound("No such product")
+      }
+    }
 
-  def addProduct(productTypeId: Int, name: String) = Action.async {
-    val newProducts = Product(0, productTypeId, name, 11, "desc", 10)
-    ProductsRepository.insertWithReturn(newProducts).map(r => Ok(Json.toJson(r)))
-  }
+  def readAll_REST =
+    Action.async { implicit request: Request[AnyContent] =>
+      ProductsRepository.all().map(products => Ok(Json.toJson(products)))
+    }
 
-  def deleteProduct(id: Int) = Action.async {
-    ProductsRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
-  }
+  def update_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      ProductsRepository
+        .update(id, getProductFromRequest(request, id))
+        .map(_ => Accepted)
+    }
 
-  def updateProduct(id: Int, newName: String) = Action.async {
-    ProductsRepository.update(id, Product(id, 1, newName, 10, "ddd", 11)).map(r => Ok(Json.toJson(r)))
-  }
+  def delete_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      ProductsRepository.deleteById(id).map(_ => Accepted)
+    }
 
 }

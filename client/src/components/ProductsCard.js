@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import Card from './Card';
 
-export default function Products() {
+export default function ProductsCard() {
   const [products, setProducts] = useState(null);
   const [error, setError] = useState(null);
   const isFetchingData = !products;
@@ -25,7 +25,7 @@ export default function Products() {
           {products &&
             products.map((product) => (
               <Link
-                to={`/product/${product.productId}`}
+                to={`/productCard/${product.productId}`}
                 key={product.productId}
                 className="list-group-item"
               >

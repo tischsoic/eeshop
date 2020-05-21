@@ -1,18 +1,26 @@
 package controllers
 
+import com.mohiva.play.silhouette
+import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject._
 import models.DeleteForm.deleteForm
-import models.ProductType
+import models.services.AuthenticateService
+import models.{ProductType, UserRole}
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import utils.DefaultEnv
+import utils.auth.HasRole
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ProductTypeController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
+class ProductTypeController @Inject()(silhouette: Silhouette[DefaultEnv],
+                                      authenticateService: AuthenticateService,
+                                      cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
+
   import dao.SQLiteProductTypesComponent._
 
 //  case class ProductType(productTypeId: Int, name: String, description: String)
@@ -87,27 +95,40 @@ class ProductTypeController @Inject()(cc: MessagesControllerComponents)(implicit
 
   /////////////////////////////////////////////////////////////////
 
-  def index = Action.async {
-    ProductTypesRepository.all().map(r => Ok(Json.toJson(r)))
+  private def getProductTypeFromRequest(request: Request[JsValue], id: Int = 0): ProductType = {
+    val name = (request.body \ "name").as[String]
+    val description = (request.body \ "description").as[String]
+
+    ProductType(id, name, description)
   }
 
-  def addProductType(name: String) = Action.async {
-    val newProductTypes = ProductType(0, name, "desc")
-    ProductTypesRepository.insertWithReturn(newProductTypes).map(r => Ok(Json.toJson(r)))
-  }
+  def create_REST =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      ProductTypesRepository
+        .insertWithReturn(getProductTypeFromRequest(request))
+        .map(faqNote => Ok(Json.toJson(faqNote)))
+    }
 
-  def deleteProductType(id: Int) = Action.async {
-    ProductTypesRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
-  }
+  def read_REST(id: Int) =
+    Action.async { implicit request: Request[AnyContent] =>
+      ProductTypesRepository.findById(id).map(faqNote => Ok(Json.toJson(faqNote)))
+    }
 
-  def updateProductType(id: Int) = Action.async {
-    ProductTypesRepository.update(id, ProductType(id, "aaaa", "desc")).map(r => Ok(Json.toJson(r)))
-  }
+  def readAll_REST =
+    Action.async { implicit request: Request[AnyContent] =>
+      ProductTypesRepository.all().map(productTypes => Ok(Json.toJson(productTypes)))
+    }
 
-  def getProductTypesWithProducts() = Action.async {
-    ProductTypesRepository
-      .getProductTypesWithProducts()
-      .map(res => Ok(res.map({ case (ptName, pName) => s"($ptName, $pName)"}).mkString(" ;; ")))
-  }
+  def update_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      ProductTypesRepository
+        .update(id, getProductTypeFromRequest(request, id))
+        .map(_ => Accepted)
+    }
+
+  def delete_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      ProductTypesRepository.deleteById(id).map(_ => Accepted)
+    }
 
 }

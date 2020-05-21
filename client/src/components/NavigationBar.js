@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { getUrl, getRequestInit } from '../utils/requestUtils';
-import { isSignedIn, getToken } from '../utils/userUtils';
+import { isSignedIn, getToken, isAdmin } from '../utils/userUtils';
 
 import { UserContext } from '../providers/UserProvider';
 import OauthButton from './OauthButton';
@@ -9,7 +9,10 @@ import OauthButton from './OauthButton';
 export default function NavigationBar() {
   const { user, setUser } = useContext(UserContext);
   const signOut = () => {
-    fetch(getUrl('sign-out'), getRequestInit({ method: 'GET' }, getToken(user)));
+    fetch(
+      getUrl('sign-out'),
+      getRequestInit({ method: 'GET' }, getToken(user))
+    );
     setUser(null);
   };
 
@@ -45,6 +48,24 @@ export default function NavigationBar() {
         >
           FAQ
         </NavLink>
+        {isAdmin(user) && (
+          <>
+            <NavLink
+              to="/product"
+              className="nav-item nav-link"
+              activeClassName="active"
+            >
+              Products
+            </NavLink>
+            <NavLink
+              to="/productType"
+              className="nav-item nav-link"
+              activeClassName="active"
+            >
+              Product Types
+            </NavLink>
+          </>
+        )}
       </div>
       {isSignedIn(user) ? (
         <button

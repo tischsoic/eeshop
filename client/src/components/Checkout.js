@@ -8,7 +8,7 @@ import Card from './Card';
 import ButtonWithSpinner from './ButtonWithSpinner';
 
 export default function Checkout() {
-  const user = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [order, setOrder] = useState(null);
   const [invoice, setInvoice] = useState(null);
   const [payment, setPayment] = useState(null);
@@ -35,7 +35,10 @@ export default function Checkout() {
       .catch(() => setError('Error while deleting order item'));
   };
   const handleBuy = () => {
-    fetch(getUrl(`invoice/${order.orderId}`), getRequestInit({ method: 'POST' }))
+    fetch(
+      getUrl(`invoice/${order.orderId}`),
+      getRequestInit({ method: 'POST' })
+    )
       .then((response) => response.json())
       .then((fetchedInvoice) => {
         setInvoice(fetchedInvoice);
@@ -143,7 +146,9 @@ export default function Checkout() {
       {stage === 'paid' && (
         <div>
           {JSON.stringify(payment)}
-          <Link to="/" className="link">Go back to shoppin</Link>
+          <Link to="/" className="link">
+            Go back to shoppin
+          </Link>
         </div>
       )}
     </Card>

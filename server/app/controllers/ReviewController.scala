@@ -1,18 +1,25 @@
 package controllers
 
+import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject._
 import models.DeleteForm.deleteForm
-import models.Review
+import models.services.AuthenticateService
+import models.{Review, UserRole}
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import utils.DefaultEnv
+import utils.auth.HasRole
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ReviewController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
+class ReviewController @Inject()(silhouette: Silhouette[DefaultEnv],
+                                 authenticateService: AuthenticateService,
+                                 cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
+
   import dao.SQLiteReviewsComponent._
   import dao.SQLiteProductsComponent._
   import dao.SQLiteUserComponent._
@@ -101,21 +108,49 @@ class ReviewController @Inject()(cc: MessagesControllerComponents)(implicit ec: 
 
   /////////////////////////////////////////////////////////////////
 
-  def index = Action.async {
-    ReviewsRepository.all().map(r => Ok(Json.toJson(r)))
+
+  private def getReviewFromRequest(request: Request[JsValue], id: Int = 0): Review = {
+    val productId = (request.body \ "productId").as[Int]
+    val authorId = (request.body \ "authorId").as[Int]
+    val content = (request.body \ "content").as[String]
+
+    Review(id, productId, authorId, content)
   }
 
-  def add() = Action.async {
-    val newReviews = Review(0, 1, 1, "ccontent")
-    ReviewsRepository.insertWithReturn(newReviews).map(r => Ok(Json.toJson(r)))
-  }
+  def create_REST =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      ReviewsRepository
+        .insertWithReturn(getReviewFromRequest(request))
+        .map(product => Ok(Json.toJson(product)))
+    }
 
-  def delete(id: Int) = Action.async {
-    ReviewsRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
-  }
+  def read_REST(id: Int) =
+    Action.async { implicit request: Request[AnyContent] =>
+      ReviewsRepository.getReview(id).map {
+        case Some((review, Some(user))) => Ok(Json.toJsObject(review) + ("user" -> Json.toJson(user)))
+        case None => NotFound("No such product")
+      }
+    }
 
-//  def update(id: Int) = Action.async {
-//    ReviewsRepository.update(id, Review(id, 1, 1, "ccontent2")).map(r => Ok(Json.toJson(r)))
-//  }
+  def readAll_REST =
+    Action.async { implicit request: Request[AnyContent] =>
+      ReviewsRepository
+        .getAllReviews()
+        .map(reviews => Ok(Json.toJson(
+          reviews.map { case (review, Some(user)) => Json.toJsObject(review) + ("user" -> Json.toJson(user)) }
+        )))
+    }
+
+  def update_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      ReviewsRepository
+        .update(id, getReviewFromRequest(request, id))
+        .map(_ => Accepted)
+    }
+
+  def delete_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      ReviewsRepository.deleteById(id).map(_ => Accepted)
+    }
 
 }

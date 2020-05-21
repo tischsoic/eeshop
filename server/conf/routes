@@ -114,11 +114,6 @@ POST    /payment                    controllers.PaymentController.add
 #PUT     /payment/:id                controllers.PaymentController.update(id: Int)
 DELETE  /payment/:id                controllers.PaymentController.delete(id: Int)
 
-GET     /review                     controllers.ReviewController.index
-POST    /review                     controllers.ReviewController.add
-#PUT     /review/:id                 controllers.ReviewController.update(id: Int)
-DELETE  /review/:id                 controllers.ReviewController.delete(id: Int)
-
 GET     /shipment                   controllers.ShipmentController.index
 POST    /shipment                   controllers.ShipmentController.add
 #PUT     /shipment/:id               controllers.ShipmentController.update(id: Int)
@@ -128,14 +123,6 @@ GET     /user                       controllers.UserController.index
 GET     /user/:id                   controllers.UserController.getUserById(id: Int)
 PUT     /user/:id                   controllers.UserController.updateUser(id: Int)
 DELETE  /user/:id                   controllers.UserController.deleteUser(id: Int)
-
-POST    /product/:ptId/:name        controllers.ProductController.addProduct(ptId: Int, name: String)
-PUT     /product/:id/:newName       controllers.ProductController.updateProduct(id: Int, newName: String)
-DELETE  /product/:id                controllers.ProductController.deleteProduct(id: Int)
-
-GET     /productType                controllers.ProductTypeController.index
-GET     /productType/products       controllers.ProductTypeController.getProductTypesWithProducts
-POST    /productType/new/:name      controllers.ProductTypeController.addProductType(name: String)
 
 # ///////////////////////////
 # // JSON API
@@ -150,17 +137,47 @@ PUT     /api/faqNote/:id            controllers.FaqNoteController.update_REST(id
 +nocsrf
 DELETE  /api/faqNote/:id            controllers.FaqNoteController.delete_REST(id: Int)
 
++nocsrf
 POST    /api/invoice/:orderId       controllers.InvoiceController.createForOrder(orderId: Int)
 
 GET     /api/order/checkout/:userId                       controllers.OrderController.getCheckout(userId: Int)
++nocsrf
 POST    /api/order/item/:productId/:quantity/:userId      controllers.OrderController.addItem(productId: Int, quantity: Int, userId: Int)
 
++nocsrf
 DELETE  /api/orderItem/:id          controllers.OrderItemController.delete(id: Int)
 
 POST    /api/payment/:invoiceId     controllers.PaymentController.payInvoice(invoiceId: Int)
 
-GET     /api/product                controllers.ProductController.getProducts
-GET     /api/product/:productId     controllers.ProductController.getProduct(productId: Int)
+
++nocsrf
+POST    /api/product                controllers.ProductController.create_REST
+GET     /api/product/:id            controllers.ProductController.read_REST(id: Int)
+GET     /api/product                controllers.ProductController.readAll_REST
++nocsrf
+PUT     /api/product/:id            controllers.ProductController.update_REST(id: Int)
++nocsrf
+DELETE  /api/product/:id            controllers.ProductController.delete_REST(id: Int)
+
+
++nocsrf
+POST    /api/productType            controllers.ProductTypeController.create_REST
+GET     /api/productType/:id        controllers.ProductTypeController.read_REST(id: Int)
+GET     /api/productType            controllers.ProductTypeController.readAll_REST
++nocsrf
+PUT     /api/productType/:id        controllers.ProductTypeController.update_REST(id: Int)
++nocsrf
+DELETE  /api/productType/:id        controllers.ProductTypeController.delete_REST(id: Int)
+
+
++nocsrf
+POST    /api/review                 controllers.ReviewController.create_REST
+GET     /api/review/:id             controllers.ReviewController.read_REST(id: Int)
+GET     /api/review                 controllers.ReviewController.readAll_REST
++nocsrf
+PUT     /api/review/:id             controllers.ReviewController.update_REST(id: Int)
++nocsrf
+DELETE  /api/review/:id             controllers.ReviewController.delete_REST(id: Int)
 
 
 ########################
