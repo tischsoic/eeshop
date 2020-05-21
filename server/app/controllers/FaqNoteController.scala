@@ -7,7 +7,7 @@ import models.{FaqNote, UserRole}
 import models.services.AuthenticateService
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import utils.DefaultEnv
 import utils.auth.HasRole
@@ -91,25 +91,35 @@ class FaqNoteController @Inject()(
 
   /////////////////////////////////////////////////////////////////
 
-  def getFaqNotes = silhouette.SecuredAction(HasRole(UserRole.Staff)).async {
-    FaqNotesRepository.all().map(r => Ok(Json.toJson(r)))
-  }
+  def create_REST =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      val title = (request.body \ "title").as[String]
+      val message = (request.body \ "message").as[String]
 
-  def index = Action.async {
-    FaqNotesRepository.all().map(r => Ok(Json.toJson(r)))
-  }
+      FaqNotesRepository.insertWithReturn(FaqNote(0, title, message)).map(faqNote => Ok(Json.toJson(faqNote)))
+    }
 
-  def add() = Action.async {
-    val newFaqNote = FaqNote(0, "title", "message")
-    FaqNotesRepository.insertWithReturn(newFaqNote).map(r => Ok(Json.toJson(r)))
-  }
+  def read_REST(id: Int) =
+    Action.async { implicit request: Request[AnyContent] =>
+      FaqNotesRepository.findById(id).map(faqNote => Ok(Json.toJson(faqNote)))
+    }
 
-  def delete(id: Int) = Action.async {
-    FaqNotesRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
-  }
+  def readAll_REST =
+    Action.async { implicit request: Request[AnyContent] =>
+      FaqNotesRepository.all().map(faqNotes => Ok(Json.toJson(faqNotes)))
+    }
 
-//  def update(id: Int) = Action.async {
-//    FaqNotesRepository.update(id, FaqNote(id, "title", "message")).map(r => Ok(Json.toJson(r)))
-//  }
+  def update_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      val title = (request.body \ "title").as[String]
+      val message = (request.body \ "message").as[String]
+
+      FaqNotesRepository.update(id, FaqNote(id, title, message)).map(_ => Accepted)
+    }
+
+  def delete_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      FaqNotesRepository.deleteById(id).map(_ => Accepted)
+    }
 
 }

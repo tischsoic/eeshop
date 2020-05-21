@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { getUrl, getRequestInit } from '../utils/requestUtils';
+import { isSignedIn, getToken } from '../utils/userUtils';
 
 import { UserContext } from '../providers/UserProvider';
 import OauthButton from './OauthButton';
@@ -8,9 +9,7 @@ import OauthButton from './OauthButton';
 export default function NavigationBar() {
   const { user, setUser } = useContext(UserContext);
   const signOut = () => {
-    const token = user ? user.token : '';
-
-    fetch(getUrl('sign-out'), getRequestInit({ method: 'GET' }, token));
+    fetch(getUrl('sign-out'), getRequestInit({ method: 'GET' }, getToken(user)));
     setUser(null);
   };
 
@@ -47,17 +46,20 @@ export default function NavigationBar() {
           FAQ
         </NavLink>
       </div>
-      <div>
-        <OauthButton provider="google" title="Google login" />
-        <OauthButton provider="facebook" title="FB login" />
-      </div>
-      <button
-        className="btn btn-outline-danger my-2 my-sm-0"
-        type="button"
-        onClick={signOut}
-      >
-        Logout
-      </button>
+      {isSignedIn(user) ? (
+        <button
+          className="btn btn-outline-danger my-2 my-sm-0"
+          type="button"
+          onClick={signOut}
+        >
+          Logout
+        </button>
+      ) : (
+        <div>
+          <OauthButton provider="google" title="Google login" />
+          <OauthButton provider="facebook" title="FB login" />
+        </div>
+      )}
     </nav>
   );
 }

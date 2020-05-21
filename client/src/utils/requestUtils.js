@@ -10,3 +10,14 @@ export const getRequestInit = (init, token) => ({
   }),
   ...init,
 });
+
+export const parseJson = (response) => {
+  check400Status(response);
+  return response.json();
+};
+
+export const check400Status = (response) => {
+  if (response.status >= 400 && response.status < 500) {
+    throw new Error('Bad response from server');
+  }
+};

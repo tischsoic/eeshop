@@ -17,6 +17,7 @@ import Orders from './components/Orders';
 import Faq from './components/Faq';
 import SignIn from './components/SignIn';
 import Oauth from './components/Oauth';
+import FaqEdit from './components/FaqEdit';
 
 function App() {
   return (
@@ -43,6 +44,9 @@ function App() {
                 </Route>
                 <Route path="/checkout">
                   <Checkout />
+                </Route>
+                <Route path="/faq/edit/:faqNoteId?">
+                  <FaqEdit />
                 </Route>
                 <Route path="/faq">
                   <Faq />

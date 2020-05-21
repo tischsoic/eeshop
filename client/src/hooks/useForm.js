@@ -2,6 +2,7 @@ import { useReducer, useCallback } from 'react';
 
 export const SET_DURING_PROCESSING = 'SET_DURING_PROCESSING';
 export const SET_FIELD = 'SET_FIELD';
+export const RESET_FIELDS = 'RESET_FIELDS';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -12,6 +13,11 @@ function reducer(state, action) {
       return {
         ...state,
         fields: { ...state.fields, [action.fieldName]: action.fieldValue },
+      };
+    case RESET_FIELDS:
+      return {
+        ...state,
+        fields: action.fields,
       };
     case SET_DURING_PROCESSING:
       return { ...state, isDuringProcessing: action.isDuringProcessing };
@@ -43,6 +49,17 @@ export default function useForm(initialFields) {
       dispatch({ type: SET_DURING_PROCESSING, isDuringProcessing }),
     [dispatch]
   );
+  const resetFields = useCallback(
+    (fields) => dispatch({ type: RESET_FIELDS, fields }),
+    [dispatch]
+  );
 
-  return [fields, isDuringProcessing, onFieldChange, setIsDuringProcessing, onFieldChangeCustom];
+  return [
+    fields,
+    isDuringProcessing,
+    onFieldChange,
+    setIsDuringProcessing,
+    onFieldChangeCustom,
+    resetFields,
+  ];
 }

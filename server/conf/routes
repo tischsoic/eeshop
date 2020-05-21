@@ -94,11 +94,6 @@ POST    /admin/user/delete                controllers.UserController.handleDelet
 
 # ///////////////////////////
 
-GET     /faqNote                    controllers.FaqNoteController.index
-POST    /faqNote                    controllers.FaqNoteController.add
-#PUT     /faqNote/:id                controllers.FaqNoteController.update(id: Int)
-DELETE  /faqNote/:id                controllers.FaqNoteController.delete(id: Int)
-
 GET     /invoice                    controllers.InvoiceController.index
 POST    /invoice                    controllers.InvoiceController.add
 #PUT     /invoice/:id                controllers.InvoiceController.update(id: Int)
@@ -146,7 +141,14 @@ POST    /productType/new/:name      controllers.ProductTypeController.addProduct
 # // JSON API
 # ///////////////////////////
 
-GET     /api/faqNote                controllers.FaqNoteController.getFaqNotes
++nocsrf
+POST    /api/faqNote                controllers.FaqNoteController.create_REST
+GET     /api/faqNote/:id            controllers.FaqNoteController.read_REST(id: Int)
+GET     /api/faqNote                controllers.FaqNoteController.readAll_REST
++nocsrf
+PUT     /api/faqNote/:id            controllers.FaqNoteController.update_REST(id: Int)
++nocsrf
+DELETE  /api/faqNote/:id            controllers.FaqNoteController.delete_REST(id: Int)
 
 POST    /api/invoice/:orderId       controllers.InvoiceController.createForOrder(orderId: Int)
 

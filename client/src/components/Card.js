@@ -1,9 +1,23 @@
 import React from 'react';
 
-export default function Card({ children, title, error, success, isLoading }) {
+export default function Card({
+  children,
+  title,
+  error,
+  success,
+  isLoading,
+  headerButtons,
+}) {
   return (
     <div className="card mb-3">
-      <h5 className="card-header">{title}</h5>
+      <div className="card-header">
+        <div className=" d-flex justify-content-between">
+          <h3 className="mb-0">{title}</h3>
+          <div className="btn-group" role="group">
+            {headerButtons}
+          </div>
+        </div>
+      </div>
       <div className="card-body">
         {error && (
           <div className="alert alert-danger" role="alert">

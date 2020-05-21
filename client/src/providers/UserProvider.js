@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useCallback } from 'react';
 
 export const UserContext = createContext(null);
 
@@ -8,15 +8,18 @@ export default function UserProvider({ children }) {
 
     return userString ? JSON.parse(userString) : null;
   });
-  function handleSetUser(user) {
-    if (user) {
-      window.localStorage.setItem('eeshop-user', JSON.stringify(user));
-    } else {
-      window.localStorage.removeItem('eeshop-user');
-    }
+  const handleSetUser = useCallback(
+    (user) => {
+      if (user) {
+        window.localStorage.setItem('eeshop-user', JSON.stringify(user));
+      } else {
+        window.localStorage.removeItem('eeshop-user');
+      }
 
-    setUser(user);
-  }
+      setUser(user);
+    },
+    [setUser]
+  );
 
   return (
     <UserContext.Provider value={{ user, setUser: handleSetUser }}>
