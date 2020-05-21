@@ -15,7 +15,6 @@ import Checkout from './components/Checkout';
 import Panel from './components/Panel';
 import Orders from './components/Orders';
 import Faq from './components/Faq';
-import SignIn from './components/SignIn';
 import Oauth from './components/Oauth';
 import FaqEdit from './components/FaqEdit';
 
@@ -32,9 +31,6 @@ function App() {
                 </Route>
                 <Route path="/oauth/:provider">
                   <Oauth />
-                </Route>
-                <Route path="/signIn">
-                  <SignIn />
                 </Route>
                 <Route path="/product/:productId">
                   <Product />
