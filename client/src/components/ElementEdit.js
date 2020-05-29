@@ -16,7 +16,7 @@ import ButtonWithSpinner from './ButtonWithSpinner';
 
 export default function ElementEdit({
   elementType,
-  title,
+  title: cardTitle,
   mapElementToFields,
   renderFormFields,
 }) {
@@ -48,10 +48,10 @@ export default function ElementEdit({
     )
       .then(handleError)
       .then(() => setRedirect(true))
-      .catch((error) => {
-        setError(error.message);
+      .catch((requestError) => {
+        setError(requestError.message);
         setIsDuringProcessing(false);
-        // setUser(null);
+        setUser(null);
       });
   };
   const handleUpdate = (event) => {
@@ -67,13 +67,13 @@ export default function ElementEdit({
       )
     )
       .then(handleError)
-      .then((response) => {
+      .then(() => {
         setRedirect(true);
       })
-      .catch((error) => {
-        setError(error.message);
+      .catch((requestError) => {
+        setError(requestError.message);
         setIsDuringProcessing(false);
-        // setUser(null);
+        setUser(null);
       });
   };
 
@@ -95,14 +95,14 @@ export default function ElementEdit({
         setError('Error while fetching element.');
         setUser(null);
       });
-  }, [resetFields, setIsFetchingData, id]);
+  }, [resetFields, setIsFetchingData, id, user, setUser, elementType, mapElementToFields, isNew]);
 
   if (redirect) {
     return <Redirect to={`/${elementType}`} />;
   }
 
   return (
-    <Card title={title} isLoading={isFetchingData} error={error}>
+    <Card title={cardTitle} isLoading={isFetchingData} error={error}>
       <form>
         {renderFormFields({
           fields,

@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { getUrl, getRequestInit, handleError, parseJson } from '../utils/requestUtils';
+import {
+  getUrl,
+  getRequestInit,
+  handleError,
+  parseJson,
+} from '../utils/requestUtils';
 import useForm from '../hooks/useForm';
 import { getToken } from '../utils/userUtils';
 
@@ -11,7 +16,7 @@ import ButtonWithSpinner from './ButtonWithSpinner';
 import ProductCardReviews from './ProductCardReviews';
 
 export default function ProductCard() {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
   const [
@@ -51,7 +56,10 @@ export default function ProductCard() {
     )
       .then(handleError)
       .then(() => setSuccess('Added to order'))
-      .catch(() => setError('Error while adding product to order.'))
+      .catch(() => {
+        setError('Error while adding product to order.');
+        setUser(null);
+      })
       .finally(() => setIsDuringProcessing(false));
   };
 
@@ -59,10 +67,11 @@ export default function ProductCard() {
     fetch(getUrl(`product/${productId}`), getRequestInit({ method: 'GET' }))
       .then(parseJson)
       .then((fetchedProduct) => setProduct(fetchedProduct))
-      .catch(() => setError('Error while fetching product data'));
-  }, [setProduct]);
-
-  console.log(product);
+      .catch(() => {
+        setError('Error while fetching product data');
+        setUser(null);
+      });
+  }, [setProduct, productId, setUser]);
 
   return (
     <Card
@@ -101,7 +110,7 @@ export default function ProductCard() {
                   isDuringProcessing={isDuringProcessing}
                   label="Buy"
                   labelProcessing="Adding to order..."
-                  disabled={!user || fields.quantity == '0'}
+                  disabled={!user || fields.quantity === '0'}
                 />
               </div>
             </div>

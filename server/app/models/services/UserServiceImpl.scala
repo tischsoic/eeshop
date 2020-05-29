@@ -21,7 +21,6 @@ class UserServiceImpl @Inject()()(implicit ec: ExecutionContext) extends UserSer
    */
   def retrieve(loginInfo: LoginInfo): Future[Option[User]] =
     UserRepository.find(loginInfo)
-//    Future.successful(Some(User(0, "em", "a", "b", "pass", UserRole.Customer)))
 
   /**
    * Retrieves a user and login info pair by userID and login info providerID

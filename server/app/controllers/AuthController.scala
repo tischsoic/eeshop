@@ -15,7 +15,6 @@ import models.services.{AccountBound, AuthenticateService, EmailIsBeingUsed, NoE
 import utils.DefaultEnv
 
 import scala.concurrent.duration.FiniteDuration
-//import com.mohiva.play.silhouette.impl.providers.oauth2.state.{ CookieStateProvider, CookieStateSettings, DummyStateProvider }
 import com.mohiva.play.silhouette.impl.providers.oauth2.GoogleProvider
 import javax.inject._
 import models.DeleteForm.deleteForm
@@ -45,7 +44,6 @@ class AuthController @Inject()(
                                 userService: UserService,
                                 authenticateService: AuthenticateService,
                                 authInfoRepository: AuthInfoRepository,
-//                                socialProviderRegistry: SocialProviderRegistry,
                                 gp: GoogleProvider,
                                 fp: FacebookProvider)
                               (implicit ec: ExecutionContext) extends MessagesAbstractController(cc) {
@@ -67,29 +65,6 @@ class AuthController @Inject()(
         None
       }
     }
-
-
-//  def auth() = Action.async { implicit request: MessagesRequest[AnyContent] =>
-//    val httpLayer = new PlayHTTPLayer(ws)
-//    val idGenerator = new SecureRandomIDGenerator()
-//    val config = configuration.underlying.as[JcaSignerSettings]("silhouette.socialStateHandler.signer")
-//    val signer = new JcaSigner(config)
-//    val settings = configuration.underlying.as[CsrfStateSettings]("silhouette.csrfStateItemHandler")
-//    val csrfStateItemHandler = new CsrfStateItemHandler(settings, idGenerator, signer)
-//    val socialStateHandler = new DefaultSocialStateHandler(Set(csrfStateItemHandler), signer)
-//    val p = new GoogleProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.google"))
-//
-////    val x: AuthenticatorResult = null;
-//
-//    p.authenticate().flatMap({
-//      case Left(result) => Future.successful(result)
-//      case Right(authInfo) => for {
-//        profile <- p.retrieveProfile(authInfo)
-//        result <- Future.successful(Ok(Json.obj("email" -> profile.email)))
-//      } yield result
-//    })
-//
-//  }
 
   def auth(provider: String) = Action.async { implicit request: Request[AnyContent] =>
     val p = provider match {

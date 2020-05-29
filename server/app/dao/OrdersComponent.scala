@@ -12,10 +12,8 @@ object SQLiteOrdersComponent
 
 trait OrdersComponent extends Tables { this: DatabaseComponent with ProfileComponent =>
   import profile.api._
-//  import scala.concurrent.ExecutionContext
 
   object OrdersRepository extends Repository[OrdersTable, Int](profile, db) {
-    // TODO: remove repetition
     implicit val orderStatusMapper = MappedColumnType.base[OrderStatus, String](
       _.toString,
       OrderStatus.withName

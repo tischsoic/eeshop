@@ -3,13 +3,6 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
-# An example controller showing how to use dependency injection
-GET     /count                      controllers.CountController.count
-# An example controller showing how to write asynchronous code
-GET     /message                    controllers.AsyncController.message
-
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
@@ -97,110 +90,110 @@ POST    /admin/user/delete                controllers.UserController.handleDelet
 # ///////////////////////////
 
 +nocsrf
-POST    /api/faqNote                controllers.FaqNoteController.create_REST
-GET     /api/faqNote/:id            controllers.FaqNoteController.read_REST(id: Int)
-GET     /api/faqNote                controllers.FaqNoteController.readAll_REST
+POST    /api/faqNote                controllers.FaqNoteController.createREST
+GET     /api/faqNote/:id            controllers.FaqNoteController.readREST(id: Int)
+GET     /api/faqNote                controllers.FaqNoteController.readAllREST
 +nocsrf
-PUT     /api/faqNote/:id            controllers.FaqNoteController.update_REST(id: Int)
+PUT     /api/faqNote/:id            controllers.FaqNoteController.updateREST(id: Int)
 +nocsrf
-DELETE  /api/faqNote/:id            controllers.FaqNoteController.delete_REST(id: Int)
+DELETE  /api/faqNote/:id            controllers.FaqNoteController.deleteREST(id: Int)
 
 
 +nocsrf
 POST    /api/invoice/:orderId       controllers.InvoiceController.createForOrder(orderId: Int)
 +nocsrf
-POST    /api/invoice                controllers.InvoiceController.create_REST
-GET     /api/invoice/:id            controllers.InvoiceController.read_REST(id: Int)
-GET     /api/invoice                controllers.InvoiceController.readAll_REST
+POST    /api/invoice                controllers.InvoiceController.createREST
+GET     /api/invoice/:id            controllers.InvoiceController.readREST(id: Int)
+GET     /api/invoice                controllers.InvoiceController.readAllREST
 +nocsrf
-PUT     /api/invoice/:id            controllers.InvoiceController.update_REST(id: Int)
+PUT     /api/invoice/:id            controllers.InvoiceController.updateREST(id: Int)
 +nocsrf
-DELETE  /api/invoice/:id            controllers.InvoiceController.delete_REST(id: Int)
+DELETE  /api/invoice/:id            controllers.InvoiceController.deleteREST(id: Int)
 
 
 +nocsrf
-POST    /api/order/item             controllers.OrderController.addItem_REST
+POST    /api/order/item             controllers.OrderController.addItemREST
 +nocsrf
-POST    /api/order                  controllers.OrderController.create_REST
-GET     /api/order/by-user          controllers.OrderController.getUserOrders_REST
-GET     /api/order/:id              controllers.OrderController.read_REST(id: Int)
-GET     /api/order                  controllers.OrderController.readAll_REST
-GET     /api/order/checkout/:userId controllers.OrderController.getCheckout_REST(userId: Int)
+POST    /api/order                  controllers.OrderController.createREST
+GET     /api/order/by-user          controllers.OrderController.getUserOrdersREST
+GET     /api/order/:id              controllers.OrderController.readREST(id: Int)
+GET     /api/order                  controllers.OrderController.readAllREST
+GET     /api/order/checkout/:userId controllers.OrderController.getCheckoutREST(userId: Int)
 +nocsrf
-PUT     /api/order/:id              controllers.OrderController.update_REST(id: Int)
+PUT     /api/order/:id              controllers.OrderController.updateREST(id: Int)
 +nocsrf
-DELETE  /api/order/:id              controllers.OrderController.delete_REST(id: Int)
+DELETE  /api/order/:id              controllers.OrderController.deleteREST(id: Int)
 
 
 +nocsrf
-POST    /api/orderItem              controllers.OrderItemController.create_REST
-GET     /api/orderItem/:id          controllers.OrderItemController.read_REST(id: Int)
-GET     /api/orderItem              controllers.OrderItemController.readAll_REST
+POST    /api/orderItem              controllers.OrderItemController.createREST
+GET     /api/orderItem/:id          controllers.OrderItemController.readREST(id: Int)
+GET     /api/orderItem              controllers.OrderItemController.readAllREST
 +nocsrf
-PUT     /api/orderItem/:id          controllers.OrderItemController.update_REST(id: Int)
+PUT     /api/orderItem/:id          controllers.OrderItemController.updateREST(id: Int)
 +nocsrf
-DELETE  /api/orderItem/:id          controllers.OrderItemController.delete_REST(id: Int)
+DELETE  /api/orderItem/:id          controllers.OrderItemController.deleteREST(id: Int)
 
 
 +nocsrf
 POST    /api/payment/:invoiceId     controllers.PaymentController.payInvoice(invoiceId: Int)
 +nocsrf
-POST    /api/payment                controllers.PaymentController.create_REST
-GET     /api/payment/:id            controllers.PaymentController.read_REST(id: Int)
-GET     /api/payment                controllers.PaymentController.readAll_REST
+POST    /api/payment                controllers.PaymentController.createREST
+GET     /api/payment/:id            controllers.PaymentController.readREST(id: Int)
+GET     /api/payment                controllers.PaymentController.readAllREST
 +nocsrf
-PUT     /api/payment/:id            controllers.PaymentController.update_REST(id: Int)
+PUT     /api/payment/:id            controllers.PaymentController.updateREST(id: Int)
 +nocsrf
-DELETE  /api/payment/:id            controllers.PaymentController.delete_REST(id: Int)
+DELETE  /api/payment/:id            controllers.PaymentController.deleteREST(id: Int)
 
 
 +nocsrf
-POST    /api/product                controllers.ProductController.create_REST
-GET     /api/product/:id            controllers.ProductController.read_REST(id: Int)
-GET     /api/product                controllers.ProductController.readAll_REST
+POST    /api/product                controllers.ProductController.createREST
+GET     /api/product/:id            controllers.ProductController.readREST(id: Int)
+GET     /api/product                controllers.ProductController.readAllREST
 +nocsrf
-PUT     /api/product/:id            controllers.ProductController.update_REST(id: Int)
+PUT     /api/product/:id            controllers.ProductController.updateREST(id: Int)
 +nocsrf
-DELETE  /api/product/:id            controllers.ProductController.delete_REST(id: Int)
+DELETE  /api/product/:id            controllers.ProductController.deleteREST(id: Int)
 
 
 +nocsrf
-POST    /api/productType            controllers.ProductTypeController.create_REST
-GET     /api/productType/:id        controllers.ProductTypeController.read_REST(id: Int)
-GET     /api/productType            controllers.ProductTypeController.readAll_REST
+POST    /api/productType            controllers.ProductTypeController.createREST
+GET     /api/productType/:id        controllers.ProductTypeController.readREST(id: Int)
+GET     /api/productType            controllers.ProductTypeController.readAllREST
 +nocsrf
-PUT     /api/productType/:id        controllers.ProductTypeController.update_REST(id: Int)
+PUT     /api/productType/:id        controllers.ProductTypeController.updateREST(id: Int)
 +nocsrf
-DELETE  /api/productType/:id        controllers.ProductTypeController.delete_REST(id: Int)
+DELETE  /api/productType/:id        controllers.ProductTypeController.deleteREST(id: Int)
 
 
 +nocsrf
-POST    /api/review                 controllers.ReviewController.create_REST
-GET     /api/review/:id             controllers.ReviewController.read_REST(id: Int)
-GET     /api/review/by-product/:id  controllers.ReviewController.readAllForProduct_REST(id: Int)
-GET     /api/review                 controllers.ReviewController.readAll_REST
+POST    /api/review                 controllers.ReviewController.createREST
+GET     /api/review/:id             controllers.ReviewController.readREST(id: Int)
+GET     /api/review/by-product/:id  controllers.ReviewController.readAllForProductREST(id: Int)
+GET     /api/review                 controllers.ReviewController.readAllREST
 +nocsrf
-PUT     /api/review/:id             controllers.ReviewController.update_REST(id: Int)
+PUT     /api/review/:id             controllers.ReviewController.updateREST(id: Int)
 +nocsrf
-DELETE  /api/review/:id             controllers.ReviewController.delete_REST(id: Int)
+DELETE  /api/review/:id             controllers.ReviewController.deleteREST(id: Int)
 
 
 +nocsrf
-POST    /api/shipment               controllers.ShipmentController.create_REST
-GET     /api/shipment/:id           controllers.ShipmentController.read_REST(id: Int)
-GET     /api/shipment               controllers.ShipmentController.readAll_REST
+POST    /api/shipment               controllers.ShipmentController.createREST
+GET     /api/shipment/:id           controllers.ShipmentController.readREST(id: Int)
+GET     /api/shipment               controllers.ShipmentController.readAllREST
 +nocsr
-PUT     /api/shipment/:id           controllers.ShipmentController.update_REST(id: Int)
+PUT     /api/shipment/:id           controllers.ShipmentController.updateREST(id: Int)
 +nocsrf
-DELETE  /api/shipment/:id           controllers.ShipmentController.delete_REST(id: Int)
+DELETE  /api/shipment/:id           controllers.ShipmentController.deleteREST(id: Int)
 
 
-GET     /api/user/:id               controllers.UserController.read_REST(id: Int)
-GET     /api/user                   controllers.UserController.readAll_REST
+GET     /api/user/:id               controllers.UserController.readREST(id: Int)
+GET     /api/user                   controllers.UserController.readAllREST
 +nocsrf
-PUT     /api/user/:id               controllers.UserController.update_REST(id: Int)
+PUT     /api/user/:id               controllers.UserController.updateREST(id: Int)
 +nocsrf
-DELETE  /api/user/:id               controllers.UserController.delete_REST(id: Int)
+DELETE  /api/user/:id               controllers.UserController.deleteREST(id: Int)
 
 
 ########################

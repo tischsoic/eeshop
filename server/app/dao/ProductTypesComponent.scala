@@ -17,10 +17,6 @@ trait ProductTypesComponent extends Tables { this: DatabaseComponent with Profil
     def setId(product: ProductType, id: Id) = product.copy(productTypeId = id)
 
     def getProductTypesWithProducts() = {
-//      val crossJoin = for {
-//        (productType, products) <- ProductTypes joinLeft Products on (_.productTypeId === _.productId)
-//      } yield (productType.name, products.map(_.price).sum)
-
       val crossJoin = for {
         product <- Products
         productType <- ProductTypes if (product.productTypeId === productType.productTypeId)

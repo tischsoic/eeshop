@@ -14,10 +14,10 @@ import ButtonWithSpinner from './ButtonWithSpinner';
 import { getToken } from '../utils/userUtils';
 
 export default function Checkout() {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [order, setOrder] = useState(null);
   const [invoice, setInvoice] = useState(null);
-  const [payment, setPayment] = useState(null);
+  const [, setPayment] = useState(null);
   const [stage, setStage] = useState('start');
   const [isDuringProcessing, setIsDuringProcessing] = useState(false);
   const [error, setError] = useState(null);
@@ -43,7 +43,10 @@ export default function Checkout() {
         });
         setIsDuringProcessing(false);
       })
-      .catch(() => setError('Error while deleting order item'))
+      .catch(() => {
+        setError('Error while deleting order item');
+        setUser(null);
+      })
       .finally(() => setIsDuringProcessing(false));
   };
   const handleBuy = () => {
@@ -59,7 +62,10 @@ export default function Checkout() {
         setInvoice(fetchedInvoice);
         setStage('invoice');
       })
-      .catch(() => setError('Error while buying'))
+      .catch(() => {
+        setError('Error while buying');
+        setUser(null);
+      })
       .finally(() => setIsDuringProcessing(false));
   };
   const handlePay = () => {
@@ -75,7 +81,10 @@ export default function Checkout() {
         setPayment(fetchedPayment);
         setStage('paid');
       })
-      .catch(() => setError('Error while buying'))
+      .catch(() => {
+        setError('Error while buying');
+        setUser(null);
+      })
       .finally(() => setIsDuringProcessing(false));
   };
   const computeTotalPrice = (orderItems) =>
@@ -97,11 +106,12 @@ export default function Checkout() {
     )
       .then(parseJson)
       .then((fetchedOrder) => setOrder(fetchedOrder))
-      .catch(() => setError('Error while fetching order data'))
+      .catch(() => {
+        setError('Error while fetching order data');
+        setUser(null);
+      })
       .finally(() => setIsDuringProcessing(false));
-  }, [setOrder, user]);
-
-  console.log(order);
+  }, [setOrder, user, setUser]);
 
   return (
     <Card title="Checkout" isLoading={isFetchingData} error={error}>

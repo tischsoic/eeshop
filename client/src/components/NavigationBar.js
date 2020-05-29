@@ -28,26 +28,30 @@ export default function NavigationBar() {
           Products
         </NavLink>
         <NavLink
-          to="/orders"
-          className="nav-item nav-link"
-          activeClassName="active"
-        >
-          Orders
-        </NavLink>
-        <NavLink
-          to="/checkout"
-          className="nav-item nav-link"
-          activeClassName="active"
-        >
-          Checkout
-        </NavLink>
-        <NavLink
           to="/faq"
           className="nav-item nav-link"
           activeClassName="active"
         >
           FAQ
         </NavLink>
+        {user && (
+          <>
+            <NavLink
+              to="/orders"
+              className="nav-item nav-link"
+              activeClassName="active"
+            >
+              Orders
+            </NavLink>
+            <NavLink
+              to="/checkout"
+              className="nav-item nav-link"
+              activeClassName="active"
+            >
+              Checkout
+            </NavLink>
+          </>
+        )}
         {isAdmin(user) && (
           <>
             <NavLink

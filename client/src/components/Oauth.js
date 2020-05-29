@@ -10,7 +10,7 @@ export default function Oauth() {
       new URLSearchParams(window.location.search).toString()
     );
     window.close();
-  }, []);
+  }, [provider]);
 
   return <div></div>;
 }

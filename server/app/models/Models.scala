@@ -84,9 +84,6 @@ object OrderStatus extends Enumeration {
 object User {
   implicit val userJsonFormat = Json.format[User]
   def tupled = (this.apply _).tupled
-
-//  def toUser(u: DBUser): User = User(u.userID, u.firstName, u.lastName, u.email, u.avatarURL, u.activated, UserRoles(u.roleId))
-//  def fromUser(u: User): DBUser = DBUser(u.userID, u.firstName, u.lastName, u.email, u.avatarURL, u.activated, u.role.id, ZonedDateTime.now)
 }
 
 object ProductType {

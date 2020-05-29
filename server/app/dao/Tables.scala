@@ -73,7 +73,6 @@ trait Tables { this: DatabaseComponent with ProfileComponent =>
   }
 
   class OrdersTable(tag: Tag) extends Table[Order](tag, "orders") {
-    // TODO: move this mapper to enum object???
     implicit val orderStatusMapper = MappedColumnType.base[OrderStatus, String](
       _.toString,
       OrderStatus.withName

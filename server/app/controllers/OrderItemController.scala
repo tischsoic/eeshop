@@ -27,7 +27,6 @@ class OrderItemController @Inject()(silhouette: Silhouette[DefaultEnv],
   import dao.SQLiteOrdersComponent._
   import dao.SQLiteProductsComponent._
 
-//  case class OrderItem(orderItemId: Int, orderId: Int, productId: Int, quantity: Int, price: Double)
   val orderItemForm: Form[OrderItem] = Form {
     mapping(
       "orderItemId" -> default(number, 0),
@@ -39,12 +38,6 @@ class OrderItemController @Inject()(silhouette: Silhouette[DefaultEnv],
   }
 
   def create() = Action.async { implicit request: MessagesRequest[AnyContent] =>
-    // TODO: interesting https://medium.com/@sderosiaux/are-scala-futures-the-past-69bd62b9c001#1cd0
-    // https://stackoverflow.com/questions/29289538/call-2-futures-in-the-same-action-async-scala-play
-//    Future.sequence(List(ProductsRepository.all(), OrdersRepository.all())).map(
-//      { case List(products: Seq[Product], orders: Seq[Order with Serializable]) =>
-//          Ok(views.html.orderItem.create(orderItemForm, orders, products)) }
-//    )
     OrdersRepository.all().flatMap(
       orders =>
         ProductsRepository.all().map(
@@ -124,34 +117,34 @@ class OrderItemController @Inject()(silhouette: Silhouette[DefaultEnv],
     OrderItem(id, orderId, productId, quantity, price)
   }
 
-  def create_REST =
+  def createREST =
     silhouette.SecuredAction.async(parse.json) { implicit request: Request[JsValue] =>
       OrderItemsRepository
         .insertWithReturn(getOrderItemFromRequest(request))
         .map(orderItem => Ok(Json.toJson(orderItem)))
     }
 
-  def read_REST(id: Int) =
+  def readREST(id: Int) =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       OrderItemsRepository
         .findById(id)
         .map(orderItem => Ok(Json.toJson(orderItem)))
     }
 
-  def readAll_REST =
+  def readAllREST =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       OrderItemsRepository.all().map(products => Ok(Json.toJson(products)))
     }
 
-  def update_REST(id: Int) =
+  def updateREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       OrderItemsRepository
         .update(id, getOrderItemFromRequest(request, id))
         .map(_ => Accepted)
     }
 
-  def delete_REST(id: Int) =
-    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+  def deleteREST(id: Int) =
+    silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       OrderItemsRepository.deleteById(id).map(_ => Accepted)
     }
 

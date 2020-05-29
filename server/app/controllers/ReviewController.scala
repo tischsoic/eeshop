@@ -24,7 +24,6 @@ class ReviewController @Inject()(silhouette: Silhouette[DefaultEnv],
   import dao.SQLiteProductsComponent._
   import dao.SQLiteUserComponent._
 
-//  case class Review(reviewId: Int, productId: Int, authorId: Int, content: String)
   val reviewForm: Form[Review] = Form {
     mapping(
       "reviewId" -> default(number, 0),
@@ -125,7 +124,7 @@ class ReviewController @Inject()(silhouette: Silhouette[DefaultEnv],
     Review(id, productId, authorId, content)
   }
 
-  def create_REST =
+  def createREST =
     Action.async { implicit request: Request[AnyContent] =>
       silhouette.UserAwareRequestHandler { userAwareRequest =>
         Future.successful(HandlerResult(Ok, userAwareRequest.identity))
@@ -143,39 +142,46 @@ class ReviewController @Inject()(silhouette: Silhouette[DefaultEnv],
       }
     }
 
-  def read_REST(id: Int) =
+  def readREST(id: Int) =
     Action.async { implicit request: Request[AnyContent] =>
       ReviewsRepository.getReview(id).map {
         case Some((review, Some(user))) => Ok(Json.toJsObject(review) + ("user" -> Json.toJson(user)))
+        case Some((_, None)) => NotFound("No such user")
         case None => NotFound("No such product")
       }
     }
 
-  def readAll_REST =
+  def readAllREST =
     Action.async { implicit request: Request[AnyContent] =>
       ReviewsRepository
         .getAllReviews()
         .map(reviews => Ok(Json.toJson(
-          reviews.map { case (review, Some(user)) => Json.toJsObject(review) + ("user" -> Json.toJson(user)) }
+          reviews.map {
+            case (review, Some(user)) => Json.toJsObject(review) + ("user" -> Json.toJson(user))
+            case (review, None) => Json.toJsObject(review)
+          }
         )))
     }
 
-  def readAllForProduct_REST(productId: Int) = Action.async { implicit request: Request[AnyContent] =>
+  def readAllForProductREST(productId: Int) = Action.async { implicit request: Request[AnyContent] =>
     ReviewsRepository
       .getAllReviewsForProduct(productId)
       .map(reviews => Ok(Json.toJson(
-        reviews.map { case (review, Some(user)) => Json.toJsObject(review) + ("user" -> Json.toJson(user)) }
+        reviews.map {
+          case (review, Some(user)) => Json.toJsObject(review) + ("user" -> Json.toJson(user))
+          case (review, None) => Json.toJsObject(review)
+        }
       )))
   }
 
-  def update_REST(id: Int) =
+  def updateREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       ReviewsRepository
         .update(id, getReviewFromRequest(request, id))
         .map(_ => Accepted)
     }
 
-  def delete_REST(id: Int) =
+  def deleteREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
       ReviewsRepository.deleteById(id).map(_ => Accepted)
     }

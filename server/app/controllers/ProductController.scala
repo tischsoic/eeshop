@@ -25,7 +25,6 @@ class ProductController @Inject()(silhouette: Silhouette[DefaultEnv],
   import dao.SQLiteProductsComponent._
   import dao.SQLiteProductTypesComponent._
 
-//  case class Product(productId: Int, productTypeId: Int, name: String, price: Double, description: String, quantity: Int)
   val productForm: Form[Product] = Form {
     mapping(
       "productId" -> default(number, 0),
@@ -109,34 +108,35 @@ class ProductController @Inject()(silhouette: Silhouette[DefaultEnv],
     Product(id, productTypeId, name, price, description, quantity)
   }
 
-  def create_REST =
+  def createREST =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       ProductsRepository
         .insertWithReturn(getProductFromRequest(request))
         .map(product => Ok(Json.toJson(product)))
     }
 
-  def read_REST(id: Int) =
+  def readREST(id: Int) =
     Action.async { implicit request: Request[AnyContent] =>
       ProductsRepository.getProduct(id).map {
         case Some((product, Some(productType))) => Ok(Json.toJsObject(product) + ("productType" -> Json.toJson(productType)))
+        case Some((_, None)) => NotFound("No such product type")
         case None => NotFound("No such product")
       }
     }
 
-  def readAll_REST =
+  def readAllREST =
     Action.async { implicit request: Request[AnyContent] =>
       ProductsRepository.all().map(products => Ok(Json.toJson(products)))
     }
 
-  def update_REST(id: Int) =
+  def updateREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       ProductsRepository
         .update(id, getProductFromRequest(request, id))
         .map(_ => Accepted)
     }
 
-  def delete_REST(id: Int) =
+  def deleteREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
       ProductsRepository.deleteById(id).map(_ => Accepted)
     }

@@ -26,7 +26,6 @@ class OrderController @Inject()(silhouette: Silhouette[DefaultEnv],
   import dao.SQLiteProductsComponent._
   import dao.SQLiteUserComponent._
 
-//  case class Order(orderId: Int, customerId: Int, status: OrderStatus)
   val orderForm: Form[Order] = Form {
     mapping(
       "orderId" -> default(number, 0),
@@ -101,7 +100,7 @@ class OrderController @Inject()(silhouette: Silhouette[DefaultEnv],
 
   /////////////////////////////////////////////////////////////////
 
-  def addItem_REST() =
+  def addItemREST() =
     silhouette.SecuredAction.async(parse.json) { implicit request: Request[JsValue] => {
       val productId = (request.body \ "productId").as[Int]
       val userId = (request.body \ "userId").as[Int]
@@ -118,7 +117,7 @@ class OrderController @Inject()(silhouette: Silhouette[DefaultEnv],
     }
   }
 
-  def getCheckout_REST(userId: Int) = silhouette.SecuredAction.async {
+  def getCheckoutREST(userId: Int) = silhouette.SecuredAction.async {
     OrdersRepository.getOrCreateCheckout(userId).flatMap({
       case Some(order) => OrderItemsRepository.getOrderItemsWithProduct(order.orderId).map(
         (orderItemsWithProduct: Seq[(OrderItem, Product, ProductType)]) =>
@@ -128,7 +127,7 @@ class OrderController @Inject()(silhouette: Silhouette[DefaultEnv],
     })
   }
 
-  def getUserOrders_REST = Action.async { implicit request =>
+  def getUserOrdersREST = Action.async { implicit request =>
     silhouette.UserAwareRequestHandler { userAwareRequest =>
       Future.successful(HandlerResult(Ok, userAwareRequest.identity))
     }(request).flatMap {
@@ -155,33 +154,33 @@ class OrderController @Inject()(silhouette: Silhouette[DefaultEnv],
     Order(id, customerId, status)
   }
 
-  def create_REST =
+  def createREST =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       OrdersRepository
         .insertWithReturn(getOrderFromRequest(request))
         .map(product => Ok(Json.toJson(product)))
     }
 
-  def read_REST(id: Int) =
+  def readREST(id: Int) =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       OrdersRepository
         .findById(id)
         .map(order => Ok(Json.toJson(order)))
     }
 
-  def readAll_REST =
+  def readAllREST =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       OrdersRepository.all().map(products => Ok(Json.toJson(products)))
     }
 
-  def update_REST(id: Int) =
+  def updateREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       OrdersRepository
         .update(id, getOrderFromRequest(request, id))
         .map(_ => Accepted)
     }
 
-  def delete_REST(id: Int) =
+  def deleteREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
       OrdersRepository.deleteById(id).map(_ => Accepted)
     }

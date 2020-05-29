@@ -1,12 +1,8 @@
-import React, { useContext } from 'react';
-
-import { UserContext } from '../providers/UserProvider';
+import React from 'react';
 
 import NavigationBar from './NavigationBar';
 
 export default function Panel({ children }) {
-  const { user } = useContext(UserContext);
-
   return (
     <>
       <NavigationBar />

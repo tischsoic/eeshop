@@ -22,7 +22,6 @@ class FaqNoteController @Inject()(
   extends MessagesAbstractController(cc) {
   import dao.SQLiteFaqNotesComponent._
 
-//  case class FaqNote(faqNoteId: Int, title: String, message: String)
   val faqNoteForm: Form[FaqNote] = Form {
     mapping(
       "faqNoteId" -> default(number, 0),
@@ -91,7 +90,7 @@ class FaqNoteController @Inject()(
 
   /////////////////////////////////////////////////////////////////
 
-  def create_REST =
+  def createREST =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       val title = (request.body \ "title").as[String]
       val message = (request.body \ "message").as[String]
@@ -99,17 +98,17 @@ class FaqNoteController @Inject()(
       FaqNotesRepository.insertWithReturn(FaqNote(0, title, message)).map(faqNote => Ok(Json.toJson(faqNote)))
     }
 
-  def read_REST(id: Int) =
+  def readREST(id: Int) =
     Action.async { implicit request: Request[AnyContent] =>
       FaqNotesRepository.findById(id).map(faqNote => Ok(Json.toJson(faqNote)))
     }
 
-  def readAll_REST =
+  def readAllREST =
     Action.async { implicit request: Request[AnyContent] =>
       FaqNotesRepository.all().map(faqNotes => Ok(Json.toJson(faqNotes)))
     }
 
-  def update_REST(id: Int) =
+  def updateREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       val title = (request.body \ "title").as[String]
       val message = (request.body \ "message").as[String]
@@ -117,7 +116,7 @@ class FaqNoteController @Inject()(
       FaqNotesRepository.update(id, FaqNote(id, title, message)).map(_ => Accepted)
     }
 
-  def delete_REST(id: Int) =
+  def deleteREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
       FaqNotesRepository.deleteById(id).map(_ => Accepted)
     }

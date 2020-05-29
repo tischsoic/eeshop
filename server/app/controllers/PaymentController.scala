@@ -29,7 +29,6 @@ class PaymentController @Inject()(silhouette: Silhouette[DefaultEnv],
   import dao.SQLiteOrdersComponent._
   import dao.SQLitePaymentsComponent._
 
-//  case class Payment(paymentId: Int, invoiceId: Int, date: Date, sum: Double)
   val paymentForm: Form[Payment] = Form {
     mapping(
       "paymentId" -> default(number, 0),
@@ -122,33 +121,33 @@ class PaymentController @Inject()(silhouette: Silhouette[DefaultEnv],
     Payment(id, invoiceId, date, sum)
   }
 
-  def create_REST =
+  def createREST =
     silhouette.SecuredAction.async(parse.json) { implicit request: Request[JsValue] =>
       PaymentsRepository
         .insertWithReturn(getPaymentFromRequest(request))
         .map(payment => Ok(Json.toJson(payment)))
     }
 
-  def read_REST(id: Int) =
+  def readREST(id: Int) =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       PaymentsRepository
         .findById(id)
         .map(payment => Ok(Json.toJson(payment)))
     }
 
-  def readAll_REST =
+  def readAllREST =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       PaymentsRepository.all().map(payment => Ok(Json.toJson(payment)))
     }
 
-  def update_REST(id: Int) =
+  def updateREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       PaymentsRepository
         .update(id, getPaymentFromRequest(request, id))
         .map(_ => Accepted)
     }
 
-  def delete_REST(id: Int) =
+  def deleteREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
       PaymentsRepository.deleteById(id).map(_ => Accepted)
     }

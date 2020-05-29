@@ -14,7 +14,7 @@ import Card from './Card';
 
 export default function Elements({
   elementType,
-  title,
+  title: cardTitle,
   elementMapper,
   getElementId,
 }) {
@@ -39,7 +39,7 @@ export default function Elements({
       })
       .catch(() => {
         setError('Something went wrong while deleting element.');
-        // setUser(null);
+        setUser(null);
       });
   };
 
@@ -56,7 +56,7 @@ export default function Elements({
         setError('Error while fetching');
         setUser(null);
       });
-  }, [setElements, forceRefresh, setUser, user]);
+  }, [setElements, forceRefresh, setUser, user, elementType]);
 
   const headerButtons = isAdmin(user) ? (
     <Link to={`/${elementType}/edit`} className="btn btn-success">
@@ -66,7 +66,7 @@ export default function Elements({
 
   return (
     <Card
-      title={title}
+      title={cardTitle}
       isLoading={isFetchingData}
       error={error}
       success={success}

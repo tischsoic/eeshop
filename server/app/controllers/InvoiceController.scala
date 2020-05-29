@@ -29,7 +29,6 @@ class InvoiceController @Inject()(silhouette: Silhouette[DefaultEnv],
   import dao.SQLiteOrdersComponent._
   import dao.SQLiteOrderItemsComponent._
 
-//  case class Invoice(invoiceId: Int, orderId: Int, totalCost: Double, date: Date)
   val invoiceForm: Form[Invoice] = Form {
     mapping(
       "invoiceId" -> default(number, 0),
@@ -129,33 +128,33 @@ class InvoiceController @Inject()(silhouette: Silhouette[DefaultEnv],
     Invoice(id, orderId, totalCost, date)
   }
 
-  def create_REST =
+  def createREST =
     silhouette.SecuredAction.async(parse.json) { implicit request: Request[JsValue] =>
       InvoicesRepository
         .insertWithReturn(getInvoiceFromRequest(request))
         .map(invoice => Ok(Json.toJson(invoice)))
     }
 
-  def read_REST(id: Int) =
+  def readREST(id: Int) =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       InvoicesRepository
         .findById(id)
         .map(invoice => Ok(Json.toJson(invoice)))
     }
 
-  def readAll_REST =
+  def readAllREST =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       InvoicesRepository.all().map(products => Ok(Json.toJson(products)))
     }
 
-  def update_REST(id: Int) =
+  def updateREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       InvoicesRepository
         .update(id, getInvoiceFromRequest(request, id))
         .map(_ => Accepted)
     }
 
-  def delete_REST(id: Int) =
+  def deleteREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
       InvoicesRepository.deleteById(id).map(_ => Accepted)
     }

@@ -14,7 +14,7 @@ import ButtonWithSpinner from './ButtonWithSpinner';
 import { getToken } from '../utils/userUtils';
 
 export default function ProductCardReviews() {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const { productId } = useParams();
   const [reviews, setReviews] = useState(null);
   const [fields, isDuringProcessing, onChange, setIsDuringProcessing] = useForm(
@@ -47,7 +47,10 @@ export default function ProductCardReviews() {
     )
       .then(parseJson)
       .then((addedReview) => setReviews([...reviews, addedReview]))
-      .catch(() => setError('Error while adding your review.'))
+      .catch(() => {
+        setError('Error while adding your review.');
+        setUser(null);
+      })
       .finally(() => setIsDuringProcessing(false));
   };
   const handleReviewDelete = (reviewId) => {
@@ -76,8 +79,11 @@ export default function ProductCardReviews() {
     )
       .then(parseJson)
       .then((fetchedReviews) => setReviews(fetchedReviews))
-      .catch(() => setError('Error while fetching reviews data'));
-  }, [setReviews, forceRefresh]);
+      .catch(() => {
+        setError('Error while fetching reviews data');
+        setUser(null);
+      });
+  }, [setReviews, forceRefresh, productId, setUser]);
 
   return (
     <div>

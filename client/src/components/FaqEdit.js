@@ -43,8 +43,8 @@ export default function FaqEdit() {
     )
       .then(handleError)
       .then(() => setRedirect(true))
-      .catch((error) => {
-        setError(error.message);
+      .catch((requestError) => {
+        setError(requestError.message);
         setUser(null);
       })
       .finally(() => setIsDuringProcessing(false));
@@ -65,8 +65,8 @@ export default function FaqEdit() {
       .then(() => {
         setRedirect(true);
       })
-      .catch((error) => {
-        setError(error.message);
+      .catch((requestError) => {
+        setError(requestError.message);
         setUser(null);
       })
       .finally(() => setIsDuringProcessing(false));
@@ -90,7 +90,7 @@ export default function FaqEdit() {
         setError('Error while fetching FAQ');
         setUser(null);
       });
-  }, [resetFields, setIsFetchingData, faqNoteId]);
+  }, [resetFields, setIsFetchingData, faqNoteId, user, isNew, setUser]);
 
   if (redirect) {
     return <Redirect to="/faq" />;

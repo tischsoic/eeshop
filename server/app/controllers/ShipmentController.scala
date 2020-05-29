@@ -26,7 +26,6 @@ class ShipmentController @Inject()(silhouette: Silhouette[DefaultEnv],
   import dao.SQLiteShipmentsComponent._
   import dao.SQLiteOrdersComponent._
 
-//  case class Shipment(shipmentId: Int, orderId: Int, date: Date, trackingCode: String)
   val shipmentForm: Form[Shipment] = Form {
     mapping(
       "shipmentId" -> default(number, 0),
@@ -107,33 +106,33 @@ class ShipmentController @Inject()(silhouette: Silhouette[DefaultEnv],
     Shipment(id, orderId, date, trackingCode)
   }
 
-  def create_REST =
+  def createREST =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       ShipmentsRepository
         .insertWithReturn(getShipmentFromRequest(request))
         .map(shipment => Ok(Json.toJson(shipment)))
     }
 
-  def read_REST(id: Int) =
+  def readREST(id: Int) =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       ShipmentsRepository
         .findById(id)
         .map(shipment => Ok(Json.toJson(shipment)))
     }
 
-  def readAll_REST =
+  def readAllREST =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
       ShipmentsRepository.all().map(shipment => Ok(Json.toJson(shipment)))
     }
 
-  def update_REST(id: Int) =
+  def updateREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       ShipmentsRepository
         .update(id, getShipmentFromRequest(request, id))
         .map(_ => Accepted)
     }
 
-  def delete_REST(id: Int) =
+  def deleteREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
       ShipmentsRepository.deleteById(id).map(_ => Accepted)
     }

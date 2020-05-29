@@ -7,6 +7,7 @@
     @alerts()
 
     <table class="table table-striped">
+        <caption>invoices</caption>
         <thead>
             <tr>
                 <th scope="col">Id</th>
@@ -21,7 +22,7 @@
             <tr>
                 <th scope="row">@invoice.invoiceId</th>
                 <td>@invoice.orderId</td>
-                <td>@invoice.totalCost</td>
+                <td>@("%.2f".format(invoice.totalCost))</td>
                 <td>@invoice.date</td>
                 <td>
                     <div class="d-flex justify-content-end">

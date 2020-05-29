@@ -21,10 +21,11 @@ export default function UserOrders() {
     )
       .then(parseJson)
       .then((fetchedOrders) => setOrders(fetchedOrders))
-      .catch(() => setError('Error while fetching orders data'));
-  }, [setOrders]);
-
-  console.log(orders);
+      .catch(() => {
+        setError('Error while fetching orders data');
+        setUser(null);
+      });
+  }, [setOrders, user, setUser]);
 
   return (
     <Card title="Your Orders" isLoading={isFetchingData} error={error}>

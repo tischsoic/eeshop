@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import { getUrl, getRequestInit } from '../utils/requestUtils';
 import { UserContext } from '../providers/UserProvider';
 
@@ -35,9 +35,9 @@ export default function OauthButton({ provider, title }) {
     const w = 500;
     const h = 500;
     const dualScreenLeft =
-      window.screenLeft != undefined ? window.screenLeft : window.screenX;
+      window.screenLeft !== undefined ? window.screenLeft : window.screenX;
     const dualScreenTop =
-      window.screenTop != undefined ? window.screenTop : window.screenY;
+      window.screenTop !== undefined ? window.screenTop : window.screenY;
 
     const width = window.innerWidth
       ? window.innerWidth

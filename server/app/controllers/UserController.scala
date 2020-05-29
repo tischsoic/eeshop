@@ -16,7 +16,6 @@ import utils.auth.HasRole
 
 import scala.concurrent.{ExecutionContext, Future}
 
-// TODO: injecting UserRepository ???
 @Singleton
 class UserController @Inject()(silhouette: Silhouette[DefaultEnv],
                                authenticateService: AuthenticateService,
@@ -58,10 +57,8 @@ class UserController @Inject()(silhouette: Silhouette[DefaultEnv],
   def update(id: Int) = Action.async { implicit request: MessagesRequest[AnyContent] =>
     UserRepository.findById(id).map {
       case None => NotFound(Json.obj({"error" -> "User not found"}))
-      case Some(user) => {
-        val u = user
-        Ok(views.html.user.update(userForm.fill(user)))
-      }
+      case Some(user) => Ok(views.html.user.update(userForm.fill(user)))
+
     }
   }
 
@@ -105,32 +102,31 @@ class UserController @Inject()(silhouette: Silhouette[DefaultEnv],
     val email = (request.body \ "email").as[String]
     val firstName = (request.body \ "firstName").as[String]
     val lastName = (request.body \ "lastName").as[String]
-    val password = ""
     val role = (request.body \ "role").as[UserRole]
 
-    User(id, email, firstName, lastName, password, role)
+    User(id, email, firstName, lastName, "", role)
   }
 
-  def read_REST(id: Int) =
+  def readREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
       UserRepository
         .findById(id)
         .map(user => Ok(Json.toJson(user)))
     }
 
-  def readAll_REST =
+  def readAllREST =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
       UserRepository.all().map(products => Ok(Json.toJson(products)))
     }
 
-  def update_REST(id: Int) =
+  def updateREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
       UserRepository
         .update(id, getUserFromRequest(request, id))
         .map(_ => Accepted)
     }
 
-  def delete_REST(id: Int) =
+  def deleteREST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
       UserRepository.deleteById(id).map(_ => Accepted)
     }
