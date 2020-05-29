@@ -45,12 +45,12 @@ export default function useForm(initialFields) {
     [dispatch]
   );
   const setIsDuringProcessing = useCallback(
-    (isDuringProcessing) =>
-      dispatch({ type: SET_DURING_PROCESSING, isDuringProcessing }),
+    (newIsDuringProcessing) =>
+      dispatch({ type: SET_DURING_PROCESSING, isDuringProcessing: newIsDuringProcessing }),
     [dispatch]
   );
   const resetFields = useCallback(
-    (fields) => dispatch({ type: RESET_FIELDS, fields }),
+    (newFields) => dispatch({ type: RESET_FIELDS, fields: newFields }),
     [dispatch]
   );
 

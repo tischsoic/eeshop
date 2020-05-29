@@ -109,8 +109,6 @@ trait OAuth2InfosComponent extends Tables { this: DatabaseComponent with Profile
      * @return A future to wait for the process to be completed.
      */
     def remove(loginInfo: LoginInfo)(implicit ec: ExecutionContext): Future[Unit] = {
-//      val q: Query[LoginInfosTable, LoginInfosTable#TableElementType, Seq] = LoginInfos.filter(li => li.providerID === loginInfo.providerID && li.providerKey === loginInfo.providerKey)
-//      db.run(q.delete).map(_ => ())
       db.run(oAuth2InfoSubQuery(loginInfo).delete).map(_ => ())
     }
   }

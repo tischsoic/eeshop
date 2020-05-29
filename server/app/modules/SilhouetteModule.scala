@@ -10,9 +10,7 @@ import com.mohiva.play.silhouette.api.{Environment, EventBus, Silhouette, Silhou
 import com.mohiva.play.silhouette.crypto.{JcaCrypter, JcaCrypterSettings, JcaSigner, JcaSignerSettings}
 import com.mohiva.play.silhouette.impl.authenticators._
 import com.mohiva.play.silhouette.impl.providers._
-import com.mohiva.play.silhouette.impl.providers.oauth1._
 import com.mohiva.play.silhouette.impl.providers.oauth1.secrets.{CookieSecretProvider, CookieSecretSettings}
-import com.mohiva.play.silhouette.impl.providers.oauth1.services.PlayOAuth1Service
 import com.mohiva.play.silhouette.impl.providers.oauth2._
 import com.mohiva.play.silhouette.impl.providers.state.{CsrfStateItemHandler, CsrfStateSettings}
 import com.mohiva.play.silhouette.impl.services._
@@ -73,16 +71,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[Clock].toInstance(Clock())
   }
 
-//  @Provides
-//  def providePasswordInfo(dbConfig: DatabaseConfigProvider): DelegableAuthInfoDAO[PasswordInfo] = {
-//    new PasswordInfoDAO(dbConfig)
-//  }
-//
-//  @Provides
-//  def provideOAuth1InfoDAO(dbConfig: DatabaseConfigProvider): DelegableAuthInfoDAO[OAuth1Info] = {
-//    new OAuth1InfoDAO(dbConfig)
-//  }
-//
   @Provides
   def provideOAuth2InfoDAO(dbConfig: DatabaseConfigProvider): DelegableAuthInfoDAO[OAuth2Info] = {
     new OAuth2InfoDAO()
@@ -117,26 +105,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       eventBus
     )
   }
-
-//  /**
-//   * Provides the social provider registry.
-//   *
-//   * @param facebookProvider The Facebook provider implementation.
-//   * @param googleProvider   The Google provider implementation.
-//   * @param twitterProvider  The Twitter provider implementation.
-//   * @return The Silhouette environment.
-//   */
-//  @Provides
-//  def provideSocialProviderRegistry(facebookProvider: FacebookProvider,
-//                                    googleProvider: GoogleProvider,
-//                                    twitterProvider: TwitterProvider): SocialProviderRegistry = {
-//
-//    SocialProviderRegistry(Seq(
-//      googleProvider,
-//      facebookProvider,
-//      twitterProvider
-//    ))
-//  }
 
   /**
    * Provides the signer for the OAuth1 token secret provider.
@@ -256,7 +224,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     val encoder = new CrypterAuthenticatorEncoder(crypter)
 
     new JWTAuthenticatorService(config, Some(new CacheAuthenticatorRepository[JWTAuthenticator](cacheLayer)), encoder, idGenerator, clock)
-//    new JWTAuthenticatorService(config, None, encoder, idGenerator, clock)
   }
 
   /**
@@ -326,21 +293,6 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     PasswordHasherRegistry(new BCryptSha256PasswordHasher(), Seq(new BCryptPasswordHasher()))
   }
 
-//  /**
-//   * Provides the credentials provider.
-//   *
-//   * @param authInfoRepository     The auth info repository implementation.
-//   * @param passwordHasherRegistry The password hasher registry.
-//   * @return The credentials provider.
-//   */
-//  @Provides
-//  def provideCredentialsProvider(authInfoRepository: AuthInfoRepository,
-//                                 passwordHasherRegistry: PasswordHasherRegistry): CredentialsProvider = {
-//
-//    new CredentialsProvider(authInfoRepository, passwordHasherRegistry)
-//  }
-
-
   /**
    * Provides the Facebook provider.
    *
@@ -374,21 +326,4 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     new GoogleProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.google"))
   }
 
-//  /**
-//   * Provides the Twitter provider.
-//   *
-//   * @param httpLayer           The HTTP layer implementation.
-//   * @param tokenSecretProvider The token secret provider implementation.
-//   * @param configuration       The Play configuration.
-//   * @return The Twitter provider.
-//   */
-//  @Provides
-//  def provideTwitterProvider(
-//                              httpLayer: HTTPLayer,
-//                              tokenSecretProvider: OAuth1TokenSecretProvider,
-//                              configuration: Configuration): TwitterProvider = {
-//
-//    val settings = configuration.underlying.as[OAuth1Settings]("silhouette.twitter")
-//    new TwitterProvider(httpLayer, new PlayOAuth1Service(settings), tokenSecretProvider, settings)
-//  }
 }

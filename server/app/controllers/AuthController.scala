@@ -90,7 +90,6 @@ class AuthController @Inject()(
   }
 
   protected def authenticateUser(user: User, loginInfo: LoginInfo, rememberMe: Boolean)(implicit request: Request[_]): Future[AuthenticatorResult] = {
-    val c = configuration.underlying
     silhouette.env.authenticatorService.create(loginInfo).flatMap { authenticator =>
       silhouette.env.eventBus.publish(LoginEvent(user, request))
       silhouette.env.authenticatorService.init(authenticator).flatMap { token =>

@@ -53,10 +53,7 @@ class ProductTypeController @Inject()(silhouette: Silhouette[DefaultEnv],
   def update(id: Int) = Action.async { implicit request: MessagesRequest[AnyContent] =>
     ProductTypesRepository.findById(id).map {
       case None => NotFound(Json.obj({"error" -> "ProductTypes not found"}))
-      case Some(productType) => {
-        val u = productType
-        Ok(views.html.productType.update(productTypeForm.fill(productType)))
-      }
+      case Some(productType) => Ok(views.html.productType.update(productTypeForm.fill(productType)))
     }
   }
 

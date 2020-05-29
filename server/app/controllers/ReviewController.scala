@@ -34,10 +34,6 @@ class ReviewController @Inject()(silhouette: Silhouette[DefaultEnv],
   }
 
   def create() = Action.async { implicit request: MessagesRequest[AnyContent] =>
-//    for (
-//      products <- ProductsRepository.all();
-//      users <- UserRepository.all()
-//    ) yield Ok(views.html.review.create(reviewForm, products, users))
     ProductsRepository.all().flatMap(
       products =>
         UserRepository.all().map(

@@ -43,7 +43,7 @@ class UserController @Inject()(silhouette: Silhouette[DefaultEnv],
     userForm.bindFromRequest.fold(
       formWithErrors => {
         Future.successful(
-          BadRequest(views.html.user.create(formWithErrors)) // TODO: it opens POST route, is it correct behaviour???
+          BadRequest(views.html.user.create(formWithErrors))
         )
       },
       user => {
@@ -66,7 +66,7 @@ class UserController @Inject()(silhouette: Silhouette[DefaultEnv],
     userForm.bindFromRequest.fold(
       formWithErrors => {
         Future.successful(
-          BadRequest(views.html.user.update(formWithErrors)) // TODO: it opens POST route, is it correct behaviour???
+          BadRequest(views.html.user.update(formWithErrors))
         )
       },
       user => {

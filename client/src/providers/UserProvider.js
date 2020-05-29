@@ -9,14 +9,14 @@ export default function UserProvider({ children }) {
     return userString ? JSON.parse(userString) : null;
   });
   const handleSetUser = useCallback(
-    (user) => {
-      if (user) {
-        window.localStorage.setItem('eeshop-user', JSON.stringify(user));
+    (userData) => {
+      if (userData) {
+        window.localStorage.setItem('eeshop-user', JSON.stringify(userData));
       } else {
         window.localStorage.removeItem('eeshop-user');
       }
 
-      setUser(user);
+      setUser(userData);
     },
     [setUser]
   );
