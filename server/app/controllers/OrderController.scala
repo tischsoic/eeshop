@@ -1,18 +1,25 @@
 package controllers
 
+import com.mohiva.play.silhouette
+import com.mohiva.play.silhouette.api.{HandlerResult, Silhouette}
 import javax.inject._
 import models.DeleteForm.deleteForm
 import models.OrderStatus.OrderStatus
-import models.{Order, OrderItem, OrderStatus, Product, ProductType}
+import models.services.AuthenticateService
+import models.{Order, OrderItem, OrderStatus, Product, ProductType, UserRole}
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import utils.DefaultEnv
+import utils.auth.HasRole
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class OrderController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
+class OrderController @Inject()(silhouette: Silhouette[DefaultEnv],
+                                authenticateService: AuthenticateService,
+                                cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
   import dao.SQLiteOrdersComponent._
   import dao.SQLiteOrderItemsComponent._
@@ -94,18 +101,24 @@ class OrderController @Inject()(cc: MessagesControllerComponents)(implicit ec: E
 
   /////////////////////////////////////////////////////////////////
 
-  def addItem(productId: Int, quantity: Int, userId: Int) = Action.async {
-    OrdersRepository.getOrCreateCheckout(userId).flatMap({
-      case Some(order) => ProductsRepository.findById(productId).flatMap({
-        case Some(product) => OrderItemsRepository
-          .insert(OrderItem(0, order.orderId, productId, quantity, product.price)).map(_ => Ok("Item added"))
-        case None => Future.successful(NotFound("Product not found"))
+  def addItem_REST() =
+    silhouette.SecuredAction.async(parse.json) { implicit request: Request[JsValue] => {
+      val productId = (request.body \ "productId").as[Int]
+      val userId = (request.body \ "userId").as[Int]
+      val quantity = (request.body \ "quantity").as[Int]
+
+      OrdersRepository.getOrCreateCheckout(userId).flatMap({
+        case Some(order) => ProductsRepository.findById(productId).flatMap({
+          case Some(product) => OrderItemsRepository
+            .insert(OrderItem(0, order.orderId, productId, quantity, product.price)).map(_ => Ok("Item added"))
+          case None => Future.successful(NotFound("Product not found"))
+        })
+        case None => Future.successful(NotFound("Order not found"))
       })
-      case None => Future.successful(NotFound("Order not found"))
-    })
+    }
   }
 
-  def getCheckout(userId: Int) = Action.async {
+  def getCheckout_REST(userId: Int) = silhouette.SecuredAction.async {
     OrdersRepository.getOrCreateCheckout(userId).flatMap({
       case Some(order) => OrderItemsRepository.getOrderItemsWithProduct(order.orderId).map(
         (orderItemsWithProduct: Seq[(OrderItem, Product, ProductType)]) =>
@@ -113,6 +126,18 @@ class OrderController @Inject()(cc: MessagesControllerComponents)(implicit ec: E
       )
       case None => Future.successful(NotFound("Order not found"))
     })
+  }
+
+  def getUserOrders_REST = Action.async { implicit request =>
+    silhouette.UserAwareRequestHandler { userAwareRequest =>
+      Future.successful(HandlerResult(Ok, userAwareRequest.identity))
+    }(request).flatMap {
+      case HandlerResult(r, Some(user)) => {
+        val userOrders = OrdersRepository.getUserOrders(user.userId)
+        userOrders.map(userOrders => Ok(Json.toJson(userOrders)))
+      }
+      case HandlerResult(r, None) => Future.successful(Unauthorized)
+    }
   }
 
   def orderItemsWithProductToJson(orderItemsWithProduct: Seq[(OrderItem, Product, ProductType)]) =
@@ -123,21 +148,42 @@ class OrderController @Inject()(cc: MessagesControllerComponents)(implicit ec: E
             ("productType" -> Json.toJsObject(productType))))
     }))
 
-  def index = Action.async {
-    OrdersRepository.all().map(r => Ok(Json.toJson(r)))
+  private def getOrderFromRequest(request: Request[JsValue], id: Int = 0): Order = {
+    val customerId = (request.body \ "customerId").as[Int]
+    val status = (request.body \ "status").as[OrderStatus]
+
+    Order(id, customerId, status)
   }
 
-  def add() = Action.async {
-    val newOrders = Order(0, 1, OrderStatus.AwaitingPayment)
-    OrdersRepository.insertWithReturn(newOrders).map(r => Ok(Json.toJson(r)))
-  }
+  def create_REST =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      OrdersRepository
+        .insertWithReturn(getOrderFromRequest(request))
+        .map(product => Ok(Json.toJson(product)))
+    }
 
-  def delete(id: Int) = Action.async {
-    OrdersRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
-  }
+  def read_REST(id: Int) =
+    silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
+      OrdersRepository
+        .findById(id)
+        .map(order => Ok(Json.toJson(order)))
+    }
 
-//  def update(id: Int) = Action.async {
-//    OrdersRepository.update(id, Order(id, 1, OrderStatus.Sent)).map(r => Ok(Json.toJson(r)))
-//  }
+  def readAll_REST =
+    silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
+      OrdersRepository.all().map(products => Ok(Json.toJson(products)))
+    }
+
+  def update_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      OrdersRepository
+        .update(id, getOrderFromRequest(request, id))
+        .map(_ => Accepted)
+    }
+
+  def delete_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      OrdersRepository.deleteById(id).map(_ => Accepted)
+    }
 
 }

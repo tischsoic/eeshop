@@ -1,20 +1,27 @@
 package controllers
 
+import com.mohiva.play.silhouette
+import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject._
 import models.DeleteForm.deleteForm
-import models.{Order, OrderItem, Product}
+import models.services.AuthenticateService
+import models.{Order, OrderItem, Product, UserRole}
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import utils.DefaultEnv
 import utils.FormUtils.priceConstraint
 import utils.DoubleImplicits._
-import scala.collection.Seq
+import utils.auth.HasRole
 
+import scala.collection.Seq
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class OrderItemController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
+class OrderItemController @Inject()(silhouette: Silhouette[DefaultEnv],
+                                    authenticateService: AuthenticateService,
+                                    cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
   import dao.SQLiteOrderItemsComponent._
   import dao.SQLiteOrdersComponent._
@@ -108,21 +115,44 @@ class OrderItemController @Inject()(cc: MessagesControllerComponents)(implicit e
 
   /////////////////////////////////////////////////////////////////
 
-  def index = Action.async {
-    OrderItemsRepository.all().map(r => Ok(Json.toJson(r)))
+  private def getOrderItemFromRequest(request: Request[JsValue], id: Int = 0): OrderItem = {
+    val orderId = (request.body \ "orderId").as[Int]
+    val productId = (request.body \ "productId").as[Int]
+    val quantity = (request.body \ "quantity").as[Int]
+    val price = (request.body \ "price").as[Double]
+
+    OrderItem(id, orderId, productId, quantity, price)
   }
 
-  def add() = Action.async {
-    val newOrderItems = OrderItem(0, 1, 1, 1, 222)
-    OrderItemsRepository.insertWithReturn(newOrderItems).map(r => Ok(Json.toJson(r)))
-  }
+  def create_REST =
+    silhouette.SecuredAction.async(parse.json) { implicit request: Request[JsValue] =>
+      OrderItemsRepository
+        .insertWithReturn(getOrderItemFromRequest(request))
+        .map(orderItem => Ok(Json.toJson(orderItem)))
+    }
 
-  def delete(id: Int) = Action.async {
-    OrderItemsRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
-  }
+  def read_REST(id: Int) =
+    silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
+      OrderItemsRepository
+        .findById(id)
+        .map(orderItem => Ok(Json.toJson(orderItem)))
+    }
 
-//  def update(id: Int) = Action.async {
-//    OrderItemsRepository.update(id, OrderItem(id, 1, 1, 1, 222)).map(r => Ok(Json.toJson(r)))
-//  }
+  def readAll_REST =
+    silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
+      OrderItemsRepository.all().map(products => Ok(Json.toJson(products)))
+    }
+
+  def update_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      OrderItemsRepository
+        .update(id, getOrderItemFromRequest(request, id))
+        .map(_ => Accepted)
+    }
+
+  def delete_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      OrderItemsRepository.deleteById(id).map(_ => Accepted)
+    }
 
 }

@@ -4,8 +4,8 @@ import { useState } from 'react';
 import {
   getUrl,
   getRequestInit,
-  check400Status,
   parseJson,
+  handleError,
 } from '../utils/requestUtils';
 import { isAdmin, getToken } from '../utils/userUtils';
 import { UserContext } from '../providers/UserProvider';
@@ -27,8 +27,8 @@ export default function Faq() {
       getUrl(`faqNote/${faqNoteId}`),
       getRequestInit({ method: 'DELETE' }, getToken(user))
     )
-      .then((response) => {
-        check400Status(response);
+      .then(handleError)
+      .then(() => {
         setFroceRefresh(forceRefresh + 1);
         setSuccess('FAQ Note deleted');
       })

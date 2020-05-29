@@ -18,7 +18,7 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 
 # ///////////////////////////
-# // "HTML" CRUD
+# // "HTML" admin panel
 # ///////////////////////////
 
 GET     /admin/faqNote/all                controllers.FaqNoteController.all
@@ -93,38 +93,6 @@ POST    /admin/user/delete                controllers.UserController.handleDelet
 
 
 # ///////////////////////////
-
-GET     /invoice                    controllers.InvoiceController.index
-POST    /invoice                    controllers.InvoiceController.add
-#PUT     /invoice/:id                controllers.InvoiceController.update(id: Int)
-DELETE  /invoice/:id                controllers.InvoiceController.delete(id: Int)
-
-GET     /order                      controllers.OrderController.index
-POST    /order                      controllers.OrderController.add
-#PUT     /order/:id                  controllers.OrderController.update(id: Int)
-DELETE  /order/:id                  controllers.OrderController.delete(id: Int)
-
-GET     /orderItem                  controllers.OrderItemController.index
-POST    /orderItem                  controllers.OrderItemController.add
-#PUT     /orderItem/:id              controllers.OrderItemController.update(id: Int)
-DELETE  /orderItem/:id              controllers.OrderItemController.delete(id: Int)
-
-GET     /payment                    controllers.PaymentController.index
-POST    /payment                    controllers.PaymentController.add
-#PUT     /payment/:id                controllers.PaymentController.update(id: Int)
-DELETE  /payment/:id                controllers.PaymentController.delete(id: Int)
-
-GET     /shipment                   controllers.ShipmentController.index
-POST    /shipment                   controllers.ShipmentController.add
-#PUT     /shipment/:id               controllers.ShipmentController.update(id: Int)
-DELETE  /shipment/:id               controllers.ShipmentController.delete(id: Int)
-
-GET     /user                       controllers.UserController.index
-GET     /user/:id                   controllers.UserController.getUserById(id: Int)
-PUT     /user/:id                   controllers.UserController.updateUser(id: Int)
-DELETE  /user/:id                   controllers.UserController.deleteUser(id: Int)
-
-# ///////////////////////////
 # // JSON API
 # ///////////////////////////
 
@@ -137,17 +105,53 @@ PUT     /api/faqNote/:id            controllers.FaqNoteController.update_REST(id
 +nocsrf
 DELETE  /api/faqNote/:id            controllers.FaqNoteController.delete_REST(id: Int)
 
+
 +nocsrf
 POST    /api/invoice/:orderId       controllers.InvoiceController.createForOrder(orderId: Int)
-
-GET     /api/order/checkout/:userId                       controllers.OrderController.getCheckout(userId: Int)
 +nocsrf
-POST    /api/order/item/:productId/:quantity/:userId      controllers.OrderController.addItem(productId: Int, quantity: Int, userId: Int)
+POST    /api/invoice                controllers.InvoiceController.create_REST
+GET     /api/invoice/:id            controllers.InvoiceController.read_REST(id: Int)
+GET     /api/invoice                controllers.InvoiceController.readAll_REST
++nocsrf
+PUT     /api/invoice/:id            controllers.InvoiceController.update_REST(id: Int)
++nocsrf
+DELETE  /api/invoice/:id            controllers.InvoiceController.delete_REST(id: Int)
+
 
 +nocsrf
-DELETE  /api/orderItem/:id          controllers.OrderItemController.delete(id: Int)
+POST    /api/order/item             controllers.OrderController.addItem_REST
++nocsrf
+POST    /api/order                  controllers.OrderController.create_REST
+GET     /api/order/by-user          controllers.OrderController.getUserOrders_REST
+GET     /api/order/:id              controllers.OrderController.read_REST(id: Int)
+GET     /api/order                  controllers.OrderController.readAll_REST
+GET     /api/order/checkout/:userId controllers.OrderController.getCheckout_REST(userId: Int)
++nocsrf
+PUT     /api/order/:id              controllers.OrderController.update_REST(id: Int)
++nocsrf
+DELETE  /api/order/:id              controllers.OrderController.delete_REST(id: Int)
 
+
++nocsrf
+POST    /api/orderItem              controllers.OrderItemController.create_REST
+GET     /api/orderItem/:id          controllers.OrderItemController.read_REST(id: Int)
+GET     /api/orderItem              controllers.OrderItemController.readAll_REST
++nocsrf
+PUT     /api/orderItem/:id          controllers.OrderItemController.update_REST(id: Int)
++nocsrf
+DELETE  /api/orderItem/:id          controllers.OrderItemController.delete_REST(id: Int)
+
+
++nocsrf
 POST    /api/payment/:invoiceId     controllers.PaymentController.payInvoice(invoiceId: Int)
++nocsrf
+POST    /api/payment                controllers.PaymentController.create_REST
+GET     /api/payment/:id            controllers.PaymentController.read_REST(id: Int)
+GET     /api/payment                controllers.PaymentController.readAll_REST
++nocsrf
+PUT     /api/payment/:id            controllers.PaymentController.update_REST(id: Int)
++nocsrf
+DELETE  /api/payment/:id            controllers.PaymentController.delete_REST(id: Int)
 
 
 +nocsrf
@@ -173,11 +177,30 @@ DELETE  /api/productType/:id        controllers.ProductTypeController.delete_RES
 +nocsrf
 POST    /api/review                 controllers.ReviewController.create_REST
 GET     /api/review/:id             controllers.ReviewController.read_REST(id: Int)
+GET     /api/review/by-product/:id  controllers.ReviewController.readAllForProduct_REST(id: Int)
 GET     /api/review                 controllers.ReviewController.readAll_REST
 +nocsrf
 PUT     /api/review/:id             controllers.ReviewController.update_REST(id: Int)
 +nocsrf
 DELETE  /api/review/:id             controllers.ReviewController.delete_REST(id: Int)
+
+
++nocsrf
+POST    /api/shipment               controllers.ShipmentController.create_REST
+GET     /api/shipment/:id           controllers.ShipmentController.read_REST(id: Int)
+GET     /api/shipment               controllers.ShipmentController.readAll_REST
++nocsr
+PUT     /api/shipment/:id           controllers.ShipmentController.update_REST(id: Int)
++nocsrf
+DELETE  /api/shipment/:id           controllers.ShipmentController.delete_REST(id: Int)
+
+
+GET     /api/user/:id               controllers.UserController.read_REST(id: Int)
+GET     /api/user                   controllers.UserController.readAll_REST
++nocsrf
+PUT     /api/user/:id               controllers.UserController.update_REST(id: Int)
++nocsrf
+DELETE  /api/user/:id               controllers.UserController.delete_REST(id: Int)
 
 
 ########################

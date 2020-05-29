@@ -1,6 +1,6 @@
 package controllers
 
-import com.mohiva.play.silhouette.api.Silhouette
+import com.mohiva.play.silhouette.api.{HandlerResult, Silhouette}
 import javax.inject._
 import models.DeleteForm.deleteForm
 import models.services.AuthenticateService
@@ -117,11 +117,30 @@ class ReviewController @Inject()(silhouette: Silhouette[DefaultEnv],
     Review(id, productId, authorId, content)
   }
 
+  private def getReviewFromJson(json: JsValue, id: Int = 0): Review = {
+    val productId = (json \ "productId").as[Int]
+    val authorId = (json \ "authorId").as[Int]
+    val content = (json \ "content").as[String]
+
+    Review(id, productId, authorId, content)
+  }
+
   def create_REST =
-    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
-      ReviewsRepository
-        .insertWithReturn(getReviewFromRequest(request))
-        .map(product => Ok(Json.toJson(product)))
+    Action.async { implicit request: Request[AnyContent] =>
+      silhouette.UserAwareRequestHandler { userAwareRequest =>
+        Future.successful(HandlerResult(Ok, userAwareRequest.identity))
+      }(request).flatMap {
+        case HandlerResult(r, Some(user)) => {
+          request.body.asJson.map { json =>
+            ReviewsRepository
+              .insertWithReturn(getReviewFromJson(json))
+              .map(review => Ok(Json.toJsObject(review) + ("user" -> Json.toJson(user))))
+          }.getOrElse {
+            Future.successful(BadRequest("Expecting Json data"))
+          }
+        }
+        case HandlerResult(r, None) => Future.successful(Unauthorized)
+      }
     }
 
   def read_REST(id: Int) =
@@ -140,6 +159,14 @@ class ReviewController @Inject()(silhouette: Silhouette[DefaultEnv],
           reviews.map { case (review, Some(user)) => Json.toJsObject(review) + ("user" -> Json.toJson(user)) }
         )))
     }
+
+  def readAllForProduct_REST(productId: Int) = Action.async { implicit request: Request[AnyContent] =>
+    ReviewsRepository
+      .getAllReviewsForProduct(productId)
+      .map(reviews => Ok(Json.toJson(
+        reviews.map { case (review, Some(user)) => Json.toJsObject(review) + ("user" -> Json.toJson(user)) }
+      )))
+  }
 
   def update_REST(id: Int) =
     silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>

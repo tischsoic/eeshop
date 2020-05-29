@@ -29,5 +29,13 @@ trait ReviewsComponent extends Tables { this: DatabaseComponent with ProfileComp
 
       db.run(query.result)
     }
+
+    def getAllReviewsForProduct(productId: Int) = {
+      val query = for {
+        (review, user) <- Reviews filter (_.productId === productId) joinLeft Users on (_.authorId === _.userId)
+      } yield (review, user)
+
+      db.run(query.result)
+    }
   }
 }

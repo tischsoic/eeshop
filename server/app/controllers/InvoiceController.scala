@@ -3,20 +3,27 @@ package controllers
 import java.sql.Date
 import java.time.LocalDate
 
+import com.mohiva.play.silhouette
+import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject._
 import models.DeleteForm.deleteForm
-import models.{Invoice, OrderItem, ProductType}
+import models.services.AuthenticateService
+import models.{Invoice, OrderItem, ProductType, UserRole}
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import utils.DefaultEnv
 import utils.DoubleImplicits._
 import utils.FormUtils.priceConstraint
+import utils.auth.HasRole
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class InvoiceController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
+class InvoiceController @Inject()(silhouette: Silhouette[DefaultEnv],
+                                  authenticateService: AuthenticateService,
+                                  cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
   import dao.SQLiteInvoicesComponent._
   import dao.SQLiteOrdersComponent._
@@ -114,21 +121,43 @@ class InvoiceController @Inject()(cc: MessagesControllerComponents)(implicit ec:
     })
   }
 
-  def index = Action.async {
-    InvoicesRepository.all().map(r => Ok(Json.toJson(r)))
+  private def getInvoiceFromRequest(request: Request[JsValue], id: Int = 0): Invoice = {
+    val orderId = (request.body \ "orderId").as[Int]
+    val totalCost = (request.body \ "totalCost").as[Double]
+    val date = (request.body \ "date").as[Date]
+
+    Invoice(id, orderId, totalCost, date)
   }
 
-  def add() = Action.async {
-    val newInvoices = Invoice(0, 1, 100, Date.valueOf(LocalDate.now()))
-    InvoicesRepository.insertWithReturn(newInvoices).map(r => Ok(Json.toJson(r)))
-  }
+  def create_REST =
+    silhouette.SecuredAction.async(parse.json) { implicit request: Request[JsValue] =>
+      InvoicesRepository
+        .insertWithReturn(getInvoiceFromRequest(request))
+        .map(invoice => Ok(Json.toJson(invoice)))
+    }
 
-  def delete(id: Int) = Action.async {
-    InvoicesRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
-  }
+  def read_REST(id: Int) =
+    silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
+      InvoicesRepository
+        .findById(id)
+        .map(invoice => Ok(Json.toJson(invoice)))
+    }
 
-//  def update(id: Int) = Action.async {
-//    InvoicesRepository.update(id, Invoice(id, 1, 111, Date.valueOf(LocalDate.now()))).map(r => Ok(Json.toJson(r)))
-//  }
+  def readAll_REST =
+    silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
+      InvoicesRepository.all().map(products => Ok(Json.toJson(products)))
+    }
+
+  def update_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      InvoicesRepository
+        .update(id, getInvoiceFromRequest(request, id))
+        .map(_ => Accepted)
+    }
+
+  def delete_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      InvoicesRepository.deleteById(id).map(_ => Accepted)
+    }
 
 }

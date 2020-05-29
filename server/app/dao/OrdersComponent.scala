@@ -32,6 +32,11 @@ trait OrdersComponent extends Tables { this: DatabaseComponent with ProfileCompo
       db.run(updateAction)
     }
 
+    def getUserOrders(userId: Int) = {
+      val query = Orders.filter(_.customerId === userId)
+      db.run(query.result)
+    }
+
     def getOrCreateCheckout(userId: Int) = {
       val insertIfNotExists = table.filter(
           order => order.customerId === userId && order.status === OrderStatus.AwaitingPayment
@@ -44,15 +49,6 @@ trait OrdersComponent extends Tables { this: DatabaseComponent with ProfileCompo
         )
 
       db.run(insertIfNotExists.transactionally)
-//      val r2 = r.map(_ => db.run(
-//        table.filter(order => order.customerId === userId && order.status === OrderStatus.AwaitingPayment).result.headOption
-//      ))
-//      r2
-//      val exists = table.filter(
-//        order => order.customerId === userId && order.status === OrderStatus.AwaitingPayment
-//      ).exists
-//      val insert = Order(0, userId, OrderStatus.AwaitingPayment)
-//      for (order <- Query(insert) if !exists) yield order
     }
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getRequestInit, getUrl } from '../utils/requestUtils';
+import { getRequestInit, getUrl, parseJson } from '../utils/requestUtils';
 import { Link } from 'react-router-dom';
 
 import Card from './Card';
@@ -11,7 +11,7 @@ export default function ProductsCard() {
 
   useEffect(() => {
     fetch(getUrl(`product`), getRequestInit({ method: 'GET' }))
-      .then((response) => response.json())
+      .then(parseJson)
       .then((fetchedProducts) => setProducts(fetchedProducts))
       .catch(() => setError('Error while fetching products'));
   }, [setProducts]);

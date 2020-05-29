@@ -5,7 +5,7 @@ import {
   getUrl,
   getRequestInit,
   parseJson,
-  check400Status,
+  handleError,
 } from '../utils/requestUtils';
 import { getToken } from '../utils/userUtils';
 import { UserContext } from '../providers/UserProvider';
@@ -41,10 +41,8 @@ export default function FaqEdit() {
         getToken(user)
       )
     )
-      .then((response) => {
-        check400Status(response);
-        setRedirect(true);
-      })
+      .then(handleError)
+      .then(() => setRedirect(true))
       .catch((error) => {
         setError(error.message);
         setUser(null);
@@ -63,8 +61,8 @@ export default function FaqEdit() {
         getToken(user)
       )
     )
-      .then((response) => {
-        check400Status(response);
+      .then(handleError)
+      .then(() => {
         setRedirect(true);
       })
       .catch((error) => {

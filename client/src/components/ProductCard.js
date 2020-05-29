@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { getUrl, getRequestInit, check400Status } from '../utils/requestUtils';
+import { getUrl, getRequestInit, handleError, parseJson } from '../utils/requestUtils';
 import useForm from '../hooks/useForm';
+import { getToken } from '../utils/userUtils';
 
 import { UserContext } from '../providers/UserProvider';
 
 import Card from './Card';
 import ButtonWithSpinner from './ButtonWithSpinner';
+import ProductCardReviews from './ProductCardReviews';
 
 export default function ProductCard() {
   const { user } = useContext(UserContext);
@@ -34,20 +36,28 @@ export default function ProductCard() {
     setError(null);
 
     fetch(
-      getUrl(`order/item/${productId}/${fields.quantity}/${user.id}`),
-      getRequestInit({ method: 'POST' })
+      getUrl(`order/item`),
+      getRequestInit(
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            userId: user.id,
+            productId: parseInt(productId),
+            quantity: fields.quantity,
+          }),
+        },
+        getToken(user)
+      )
     )
-      .then((response) => {
-        check400Status(response);
-        setSuccess('Added to order');
-      })
+      .then(handleError)
+      .then(() => setSuccess('Added to order'))
       .catch(() => setError('Error while adding product to order.'))
       .finally(() => setIsDuringProcessing(false));
   };
 
   useEffect(() => {
     fetch(getUrl(`product/${productId}`), getRequestInit({ method: 'GET' }))
-      .then((response) => response.json())
+      .then(parseJson)
       .then((fetchedProduct) => setProduct(fetchedProduct))
       .catch(() => setError('Error while fetching product data'));
   }, [setProduct]);
@@ -96,6 +106,7 @@ export default function ProductCard() {
               </div>
             </div>
           </form>
+          <ProductCardReviews />
         </div>
       )}
     </Card>

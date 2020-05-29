@@ -5,7 +5,7 @@ import {
   getUrl,
   getRequestInit,
   parseJson,
-  check400Status,
+  handleError,
 } from '../utils/requestUtils';
 import { getToken } from '../utils/userUtils';
 import useForm from '../hooks/useForm';
@@ -46,10 +46,8 @@ export default function ElementEdit({
         getToken(user)
       )
     )
-      .then((response) => {
-        check400Status(response);
-        setRedirect(true);
-      })
+      .then(handleError)
+      .then(() => setRedirect(true))
       .catch((error) => {
         setError(error.message);
         setIsDuringProcessing(false);
@@ -68,8 +66,8 @@ export default function ElementEdit({
         getToken(user)
       )
     )
+      .then(handleError)
       .then((response) => {
-        check400Status(response);
         setRedirect(true);
       })
       .catch((error) => {

@@ -1,19 +1,26 @@
 package controllers
 
+import com.mohiva.play.silhouette
+import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject._
 import models.UserRole.UserRole
 import models.{User, UserRole}
 import models.DeleteForm.deleteForm
+import models.services.AuthenticateService
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import utils.DefaultEnv
+import utils.auth.HasRole
 
 import scala.concurrent.{ExecutionContext, Future}
 
 // TODO: injecting UserRepository ???
 @Singleton
-class UserController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
+class UserController @Inject()(silhouette: Silhouette[DefaultEnv],
+                               authenticateService: AuthenticateService,
+                               cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
   import dao.SQLiteUserComponent._
   import dao.SQLiteUserComponent.profile.api._
@@ -27,10 +34,6 @@ class UserController @Inject()(cc: MessagesControllerComponents)(implicit ec: Ex
       "password" -> nonEmptyText,
       "role" -> Forms.of[UserRole]
     )(User.apply)(User.unapply)
-  }
-
-  def index = Action.async {
-    UserRepository.all().map(r => Ok(Json.toJson(r)))
   }
 
   def create() = Action { implicit request: MessagesRequest[AnyContent] =>
@@ -94,24 +97,42 @@ class UserController @Inject()(cc: MessagesControllerComponents)(implicit ec: Ex
     )
   }
 
-  def addUser(e: String) = Action.async {
-    val newUser = User(0, e + "a@a.com", "Jfstname", "B", "pass", UserRole.Staff)
-    UserRepository.insertWithReturn(newUser).map(r => Ok(Json.toJson(r)))
+
+  /////////////////////////////////////////////////////////////////
+
+
+  private def getUserFromRequest(request: Request[JsValue], id: Int = 0): User = {
+    val email = (request.body \ "email").as[String]
+    val firstName = (request.body \ "firstName").as[String]
+    val lastName = (request.body \ "lastName").as[String]
+    val password = ""
+    val role = (request.body \ "role").as[UserRole]
+
+    User(id, email, firstName, lastName, password, role)
   }
 
-  def deleteUser(id: Int) = Action.async {
-    UserRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
-  }
-
-  def updateUser(id: Int) = Action.async {
-    UserRepository.update(id, User(id, "ss44a@a.com", "Jfstname", "B", "pass", UserRole.Staff)).map(r => Ok(Json.toJson(r)))
-  }
-
-  def getUserById(id: Int) = Action.async {
-    UserRepository.findById(id).map {
-      case None => NotFound("User not found!")
-      case Some(user) => Ok(user.toString)
+  def read_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      UserRepository
+        .findById(id)
+        .map(user => Ok(Json.toJson(user)))
     }
-  }
+
+  def readAll_REST =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      UserRepository.all().map(products => Ok(Json.toJson(products)))
+    }
+
+  def update_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      UserRepository
+        .update(id, getUserFromRequest(request, id))
+        .map(_ => Accepted)
+    }
+
+  def delete_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      UserRepository.deleteById(id).map(_ => Accepted)
+    }
 
 }

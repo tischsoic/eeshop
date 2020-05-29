@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { getUrl, getRequestInit } from '../utils/requestUtils';
+import {
+  getUrl,
+  getRequestInit,
+  parseJson,
+  handleError,
+} from '../utils/requestUtils';
 
 import { UserContext } from '../providers/UserProvider';
 
 import Card from './Card';
 import ButtonWithSpinner from './ButtonWithSpinner';
+import { getToken } from '../utils/userUtils';
 
 export default function Checkout() {
   const { user } = useContext(UserContext);
@@ -13,16 +19,20 @@ export default function Checkout() {
   const [invoice, setInvoice] = useState(null);
   const [payment, setPayment] = useState(null);
   const [stage, setStage] = useState('start');
-  // const [orderItemsDuringDeleting, setOrderItemsDuringDeleting] = useState([])
+  const [isDuringProcessing, setIsDuringProcessing] = useState(false);
   const [error, setError] = useState(null);
   const isFetchingData = !order;
   const deleteOrderItem = (orderItemId) => {
+    setIsDuringProcessing(true);
+    setError(null);
+
     console.log(orderItemId);
     fetch(
       getUrl(`orderItem/${orderItemId}`),
-      getRequestInit({ method: 'DELETE' })
+      getRequestInit({ method: 'DELETE' }, getToken(user))
     )
-      .then(() =>
+      .then(handleError)
+      .then(() => {
         setOrder({
           ...order,
           items: [
@@ -30,50 +40,66 @@ export default function Checkout() {
               (orderItem) => orderItem.orderItemId !== orderItemId
             ),
           ],
-        })
-      )
-      .catch(() => setError('Error while deleting order item'));
+        });
+        setIsDuringProcessing(false);
+      })
+      .catch(() => setError('Error while deleting order item'))
+      .finally(() => setIsDuringProcessing(false));
   };
   const handleBuy = () => {
+    setIsDuringProcessing(true);
+    setError(null);
+
     fetch(
       getUrl(`invoice/${order.orderId}`),
       getRequestInit({ method: 'POST' })
     )
-      .then((response) => response.json())
+      .then(parseJson)
       .then((fetchedInvoice) => {
         setInvoice(fetchedInvoice);
         setStage('invoice');
       })
-      .catch(() => setError('Error while buying'));
+      .catch(() => setError('Error while buying'))
+      .finally(() => setIsDuringProcessing(false));
   };
   const handlePay = () => {
+    setIsDuringProcessing(true);
+    setError(null);
+
     fetch(
       getUrl(`payment/${invoice.invoiceId}`),
-      getRequestInit({ method: 'POST' })
+      getRequestInit({ method: 'POST' }, getToken(user))
     )
-      .then((response) => response.json())
+      .then(parseJson)
       .then((fetchedPayment) => {
         setPayment(fetchedPayment);
         setStage('paid');
       })
-      .catch(() => setError('Error while buying'));
+      .catch(() => setError('Error while buying'))
+      .finally(() => setIsDuringProcessing(false));
   };
   const computeTotalPrice = (orderItems) =>
-    orderItems.reduce(
-      (totalPrice, orderItem) =>
-        totalPrice + orderItem.quantity * orderItem.price,
-      0
-    );
+    orderItems
+      .reduce(
+        (totalPrice, orderItem) =>
+          totalPrice + orderItem.quantity * orderItem.price,
+        0
+      )
+      .toFixed(2);
 
   useEffect(() => {
+    setIsDuringProcessing(true);
+    setError(null);
+
     fetch(
       getUrl(`order/checkout/${user.id}`),
-      getRequestInit({ method: 'GET' })
+      getRequestInit({ method: 'GET' }, getToken(user))
     )
-      .then((response) => response.json())
+      .then(parseJson)
       .then((fetchedOrder) => setOrder(fetchedOrder))
-      .catch(() => setError('Error while fetching order data'));
-  }, [setOrder]);
+      .catch(() => setError('Error while fetching order data'))
+      .finally(() => setIsDuringProcessing(false));
+  }, [setOrder, user]);
 
   console.log(order);
 
@@ -105,7 +131,7 @@ export default function Checkout() {
                           type="button"
                           className="btn btn-danger"
                           onClick={() => deleteOrderItem(orderItem.orderItemId)}
-                          // isDuringProcessing={isDuringProcessing}
+                          isDuringProcessing={isDuringProcessing}
                           label="Delete"
                           labelProcessing="Deleting..."
                         />
@@ -114,7 +140,7 @@ export default function Checkout() {
                   </tr>
                 ))}
             </tbody>
-          </table>{' '}
+          </table>
           {order && (
             <>
               <h4>Total price: {computeTotalPrice(order.items)}</h4>
@@ -122,9 +148,10 @@ export default function Checkout() {
                 type="button"
                 className="btn btn-danger"
                 onClick={handleBuy}
-                // isDuringProcessing={isDuringProcessing}
+                isDuringProcessing={isDuringProcessing}
                 label="Buy"
                 labelProcessing="Buying..."
+                disabled={order.items.length === 0}
               />
             </>
           )}
@@ -132,12 +159,13 @@ export default function Checkout() {
       )}
       {stage === 'invoice' && (
         <div>
-          {JSON.stringify(invoice)}
+          <h3>Invoice no. {invoice.invoiceId}</h3>
+          <h4>Total cost: {invoice.totalCost.toFixed(2)}</h4>
           <ButtonWithSpinner
             type="button"
             className="btn btn-danger"
             onClick={handlePay}
-            // isDuringProcessing={isDuringProcessing}
+            isDuringProcessing={isDuringProcessing}
             label="Pay"
             labelProcessing="Paying..."
           />
@@ -145,10 +173,16 @@ export default function Checkout() {
       )}
       {stage === 'paid' && (
         <div>
-          {JSON.stringify(payment)}
-          <Link to="/" className="link">
-            Go back to shoppin
-          </Link>
+          <h3>
+            {error
+              ? 'Something went wrong.'
+              : 'We received your payment. We will ship your products soon...'}
+          </h3>
+          <h2>
+            <Link to="/" className="link">
+              Go back to shopping
+            </Link>
+          </h2>
         </div>
       )}
     </Card>

@@ -12,12 +12,13 @@ export const getRequestInit = (init, token) => ({
 });
 
 export const parseJson = (response) => {
-  check400Status(response);
+  handleError(response);
   return response.json();
 };
 
-export const check400Status = (response) => {
-  if (response.status >= 400 && response.status < 500) {
+export const handleError = (response) => {
+  if (!response.ok) {
     throw new Error('Bad response from server');
   }
+  return response;
 };

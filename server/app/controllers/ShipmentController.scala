@@ -3,18 +3,25 @@ package controllers
 import java.sql.Date
 import java.time.LocalDate
 
+import com.mohiva.play.silhouette
+import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject._
 import models.DeleteForm.deleteForm
-import models.Shipment
+import models.services.AuthenticateService
+import models.{Shipment, UserRole}
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
+import utils.DefaultEnv
+import utils.auth.HasRole
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ShipmentController @Inject()(cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
+class ShipmentController @Inject()(silhouette: Silhouette[DefaultEnv],
+                                   authenticateService: AuthenticateService,
+                                   cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
   extends MessagesAbstractController(cc) {
   import dao.SQLiteShipmentsComponent._
   import dao.SQLiteOrdersComponent._
@@ -91,21 +98,44 @@ class ShipmentController @Inject()(cc: MessagesControllerComponents)(implicit ec
 
   /////////////////////////////////////////////////////////////////
 
-  def index = Action.async {
-    ShipmentsRepository.all().map(r => Ok(Json.toJson(r)))
+
+  private def getShipmentFromRequest(request: Request[JsValue], id: Int = 0): Shipment = {
+    val orderId = (request.body \ "orderId").as[Int]
+    val date = (request.body \ "date").as[Date]
+    val trackingCode = (request.body \ "trackingCode").as[String]
+
+    Shipment(id, orderId, date, trackingCode)
   }
 
-  def add() = Action.async {
-    val newShipments = Shipment(0, 1, Date.valueOf(LocalDate.now()), "straa")
-    ShipmentsRepository.insertWithReturn(newShipments).map(r => Ok(Json.toJson(r)))
-  }
+  def create_REST =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      ShipmentsRepository
+        .insertWithReturn(getShipmentFromRequest(request))
+        .map(shipment => Ok(Json.toJson(shipment)))
+    }
 
-  def delete(id: Int) = Action.async {
-    ShipmentsRepository.deleteById(id).map(r => Ok(Json.toJson(r)))
-  }
+  def read_REST(id: Int) =
+    silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
+      ShipmentsRepository
+        .findById(id)
+        .map(shipment => Ok(Json.toJson(shipment)))
+    }
 
-//  def update(id: Int) = Action.async {
-//    ShipmentsRepository.update(id, Shipment(id, 1, Date.valueOf(LocalDate.now()), "straa 2")).map(r => Ok(Json.toJson(r)))
-//  }
+  def readAll_REST =
+    silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
+      ShipmentsRepository.all().map(shipment => Ok(Json.toJson(shipment)))
+    }
+
+  def update_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      ShipmentsRepository
+        .update(id, getShipmentFromRequest(request, id))
+        .map(_ => Accepted)
+    }
+
+  def delete_REST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      ShipmentsRepository.deleteById(id).map(_ => Accepted)
+    }
 
 }
