@@ -1,16 +1,42 @@
 @(users: Seq[User], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
 
 @import helper._
+@import views.html.utils.alerts
 
-@flash.get("success").getOrElse("")
-<ul>
-@for(user <- users) {
-    <li>@user.email
-        @form(routes.UserController.handleDelete()) {
-            @helper.CSRF.formField
-            <input type="hidden" name="id" value="@user.userId" >
-            <input type="submit" value="Delete" />
-        }
-    </li>
+@main("Users") {
+    @alerts()
+
+    <table class="table table-striped">
+        <caption>users</caption>
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Email</th>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Role</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(user <- users) {
+            <tr>
+                <th scope="row">@user.userId</th>
+                <td>@user.email</td>
+                <td>@user.firstName</td>
+                <td>@user.lastName</td>
+                <td>@user.role</td>
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary mr-2" href="/admin/user/update/@user.userId">Edit</a>
+                        @form(routes.UserController.handleDelete()) {
+                            @helper.CSRF.formField
+                            <input type="hidden" name="id" value="@user.userId" >
+                            <input type="submit" value="Delete" class="btn btn-danger"/>
+                        }
+                    </div>
+                </td>
+                }
+        </tbody>
+    </table>
 }
-</ul>

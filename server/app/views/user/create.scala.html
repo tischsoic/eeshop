@@ -1,10 +1,11 @@
 @(userForm: Form[User])(implicit request: MessagesRequestHeader, flash: Flash)
 
 @import views.html.user.userCommonForm
+@import views.html.utils.alerts
 
 @title = @{"Create user"}
 
 @main(title) {
-    @flash.get("success").getOrElse("")
+    @alerts()
     @userCommonForm(userForm, routes.UserController.handleCreate(), title)
 }
