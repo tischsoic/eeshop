@@ -22,6 +22,7 @@ import Product from './components/Product';
 import ProductEdit from './components/ProductEdit';
 import UserOrders from './components/UserOrders';
 import RequireUser from './components/RequireUser';
+import AllOrders from './components/AllOrders';
 
 function App() {
   return (
@@ -43,6 +44,11 @@ function App() {
                 <Route path="/orders">
                   <RequireUser>
                     <UserOrders />
+                  </RequireUser>
+                </Route>
+                <Route path="/allorders">
+                  <RequireUser>
+                    <AllOrders />
                   </RequireUser>
                 </Route>
                 <Route path="/checkout">

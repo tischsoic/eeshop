@@ -8,7 +8,7 @@ import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject._
 import models.DeleteForm.deleteForm
 import models.services.AuthenticateService
-import models.{Shipment, UserRole}
+import models.{OrderStatus, Shipment, UserRole}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.{JsValue, Json}
@@ -111,6 +111,22 @@ class ShipmentController @Inject()(silhouette: Silhouette[DefaultEnv],
       ShipmentsRepository
         .insertWithReturn(getShipmentFromRequest(request))
         .map(shipment => Ok(Json.toJson(shipment)))
+    }
+
+  def createForOrderREST =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async(parse.json) { implicit request: Request[JsValue] =>
+      val shipment = getShipmentFromRequest(request)
+      ShipmentsRepository
+        .insertWithReturn(shipment)
+        .flatMap(_ =>
+          OrdersRepository
+            .updateStatus(shipment.orderId, OrderStatus.Sent)
+            .flatMap(_ =>
+              OrdersRepository
+                .all()
+                .map(orders => Ok(Json.toJson(orders)))
+            )
+        )
     }
 
   def readREST(id: Int) =

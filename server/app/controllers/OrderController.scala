@@ -170,7 +170,7 @@ class OrderController @Inject()(silhouette: Silhouette[DefaultEnv],
 
   def readAllREST =
     silhouette.SecuredAction.async { implicit request: Request[AnyContent] =>
-      OrdersRepository.all().map(products => Ok(Json.toJson(products)))
+      OrdersRepository.all().map(orders => Ok(Json.toJson(orders)))
     }
 
   def updateREST(id: Int) =
@@ -178,6 +178,17 @@ class OrderController @Inject()(silhouette: Silhouette[DefaultEnv],
       OrdersRepository
         .update(id, getOrderFromRequest(request, id))
         .map(_ => Accepted)
+    }
+
+  def updateDeliveredREST(id: Int) =
+    silhouette.SecuredAction(HasRole(UserRole.Staff)).async { implicit request: Request[AnyContent] =>
+      OrdersRepository
+        .updateStatus(id, OrderStatus.Delivered)
+        .flatMap(_ =>
+          OrdersRepository
+            .all()
+            .map(orders => Ok(Json.toJson(orders)))
+        )
     }
 
   def deleteREST(id: Int) =

@@ -122,6 +122,8 @@ GET     /api/order/checkout/:userId controllers.OrderController.getCheckoutREST(
 +nocsrf
 PUT     /api/order/:id              controllers.OrderController.updateREST(id: Int)
 +nocsrf
+PUT     /api/order/:id/delivered    controllers.OrderController.updateDeliveredREST(id: Int)
++nocsrf
 DELETE  /api/order/:id              controllers.OrderController.deleteREST(id: Int)
 
 
@@ -180,6 +182,8 @@ DELETE  /api/review/:id             controllers.ReviewController.deleteREST(id: 
 
 +nocsrf
 POST    /api/shipment               controllers.ShipmentController.createREST
++nocsrf
+POST    /api/shipment/for-order     controllers.ShipmentController.createForOrderREST
 GET     /api/shipment/:id           controllers.ShipmentController.readREST(id: Int)
 GET     /api/shipment               controllers.ShipmentController.readAllREST
 +nocsr

@@ -68,6 +68,13 @@ export default function NavigationBar() {
             >
               Product Types
             </NavLink>
+            <NavLink
+              to="/allorders"
+              className="nav-item nav-link"
+              activeClassName="active"
+            >
+              All Orders
+            </NavLink>
           </>
         )}
       </div>
