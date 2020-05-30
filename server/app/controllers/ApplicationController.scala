@@ -41,7 +41,7 @@ class ApplicationController @Inject()(components: ControllerComponents,
    * @return
    */
   private def fetchWebpackServer(path: String)(implicit request: RequestHeader) = {
-    ws.url(s"http://localhost:3000/$path").get().map { r =>
+    ws.url(s"http://host.docker.internal:3000/$path").get().map { r =>
       if (r.contentType.equalsIgnoreCase(HTML(Codec.utf_8))) {
         val html = r.bodyAsBytes.utf8String
 
