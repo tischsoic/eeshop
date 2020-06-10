@@ -1,0 +1,11 @@
+@(productTypeForm: Form[ProductType])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.productType.productTypeCommonForm
+@import views.html.utils.alerts
+
+@title = @{"Update productType"}
+
+@main(title) {
+    @alerts()
+    @productTypeCommonForm(productTypeForm, routes.ProductTypeController.handleUpdate(), title)
+}

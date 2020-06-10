@@ -1,0 +1,30 @@
+version: '3'
+services:
+  server:
+    build:
+      context: .
+      dockerfile: docker/server/Dockerfile
+    # image: tischsoic/alvis-editor-backend
+    environment:
+      NODE_ENV: developement
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./server:/home/server
+    #   - /home/alvis-editor/node_modules
+
+  client:
+    build:
+      context: .
+      dockerfile: docker/client/Dockerfile
+    # image: tischsoic/alvis-editor-frontend
+    tty: true
+    environment:
+      NODE_ENV: developement
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+    volumes:
+      - ./client:/home/client
+    #   - /home/client/node_modules

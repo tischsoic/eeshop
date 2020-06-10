@@ -1,0 +1,11 @@
+@(userForm: Form[User])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.user.userCommonForm
+@import views.html.utils.alerts
+
+@title = @{"Update user"}
+
+@main(title) {
+    @alerts()
+    @userCommonForm(userForm, routes.UserController.handleUpdate(), title)
+}

@@ -1,0 +1,11 @@
+@(orderForm: Form[Order], users: Seq[User])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.order.orderCommonForm
+@import views.html.utils.alerts
+
+@title = @{"Create order"}
+
+@main(title) {
+    @alerts()
+    @orderCommonForm(orderForm, users, routes.OrderController.handleCreate(), title)
+}

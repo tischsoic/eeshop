@@ -1,0 +1,13 @@
+@()(implicit request: MessagesRequestHeader, flash: Flash)
+
+@if(flash.get("success").isDefined) {
+    <div class="alert alert-success" role="alert">
+    @flash.get("success").getOrElse("")
+    </div>
+}
+
+@if(flash.get("error").isDefined) {
+    <div class="alert alert-error" role="alert">
+    @flash.get("error").getOrElse("")
+    </div>
+}

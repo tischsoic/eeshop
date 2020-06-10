@@ -1,0 +1,33 @@
+@import views.html.utils.card
+@(title: String)(content: Html)(implicit headerButtons: Html = null)
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>@title</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+        <script src="@routes.Assets.versioned("javascripts/hello.js")" type="text/javascript"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand navbar-light bg-light justify-content-between mb-5 px-5">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="/admin/faqNote/all">FAQ</a>
+                <a class="nav-item nav-link" href="/admin/invoice/all">Invoices</a>
+                <a class="nav-item nav-link" href="/admin/order/all">Orders</a>
+                <a class="nav-item nav-link" href="/admin/payment/all">Payments</a>
+                <a class="nav-item nav-link" href="/admin/product/all">Products</a>
+                <a class="nav-item nav-link" href="/admin/productType/all">Products' Types</a>
+                <a class="nav-item nav-link" href="/admin/review/all">Reviews</a>
+                <a class="nav-item nav-link" href="/admin/shipment/all">Shipments</a>
+                <a class="nav-item nav-link" href="/admin/user/all">Users</a>
+            </div>
+            <button class="btn btn-outline-danger my-2 my-sm-0" type="button">Logout</button>
+        </nav>
+        <div class="container">
+            @card(content, title, headerButtons)
+        </div>
+    </body>
+</html>

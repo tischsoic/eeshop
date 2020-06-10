@@ -1,0 +1,11 @@
+@(invoiceForm: Form[Invoice], orders: Seq[Order])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.invoice.invoiceCommonForm
+@import views.html.utils.alerts
+
+@title = @{"Create invoice"}
+
+@main(title) {
+    @alerts()
+    @invoiceCommonForm(invoiceForm, orders, routes.InvoiceController.handleCreate(), title)
+}

@@ -1,0 +1,42 @@
+@(payments: Seq[Payment], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import helper._
+@import views.html.utils.alerts
+
+@main("Payments") {
+    @alerts()
+
+    <table class="table table-striped">
+        <caption>payments</caption>
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Invoice Id</th>
+                <th scope="col">Date</th>
+                <th scope="col">Sum</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(payment <- payments) {
+            <tr>
+                <th scope="row">@payment.paymentId</th>
+                <td>@payment.invoiceId</td>
+                <td>@payment.date</td>
+                <td>@("%.2f".format(payment.sum))</td>
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary mr-2" href="/admin/payment/update/@payment.paymentId">Edit</a>
+                        @form(routes.PaymentController.handleDelete()) {
+                            @helper.CSRF.formField
+                            <input type="hidden" name="id" value="@payment.paymentId" >
+                            <input type="submit" value="Delete" class="btn btn-danger"/>
+                        }
+                    </div>
+                </td>
+                }
+        </tbody>
+    </table>
+} {
+    <a class="btn btn-success" href="/admin/payment/create">Add</a>
+}

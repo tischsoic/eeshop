@@ -1,0 +1,42 @@
+@(reviews: Seq[Review], deleteForm: Form[DeleteForm])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import helper._
+@import views.html.utils.alerts
+
+@main("Reviews") {
+    @alerts()
+
+    <table class="table table-striped">
+        <caption>reviews</caption>
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Product Id</th>
+                <th scope="col">Author Id</th>
+                <th scope="col">Content</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(review <- reviews) {
+            <tr>
+                <th scope="row">@review.reviewId</th>
+                <td>@review.productId</td>
+                <td>@review.authorId</td>
+                <td>@review.content</td>
+                <td>
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary mr-2" href="/admin/review/update/@review.reviewId">Edit</a>
+                        @form(routes.ReviewController.handleDelete()) {
+                            @helper.CSRF.formField
+                            <input type="hidden" name="id" value="@review.reviewId" >
+                            <input type="submit" value="Delete" class="btn btn-danger"/>
+                        }
+                    </div>
+                </td>
+                }
+        </tbody>
+    </table>
+} {
+    <a class="btn btn-success" href="/admin/review/create">Add</a>
+}

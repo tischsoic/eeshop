@@ -1,0 +1,11 @@
+@(shipmentForm: Form[Shipment], orders: Seq[Order])(implicit request: MessagesRequestHeader, flash: Flash)
+
+@import views.html.shipment.shipmentCommonForm
+@import views.html.utils.alerts
+
+@title = @{"Update shipment"}
+
+@main(title) {
+    @alerts()
+    @shipmentCommonForm(shipmentForm, orders, routes.ShipmentController.handleUpdate(), title)
+}

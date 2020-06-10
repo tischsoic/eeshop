@@ -1,0 +1,209 @@
+
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+
+# eeshop
+
+
+# ///////////////////////////
+# // "HTML" admin panel
+# ///////////////////////////
+
+GET     /admin/faqNote/all                controllers.FaqNoteController.all
+GET     /admin/faqNote/create             controllers.FaqNoteController.create
+GET     /admin/faqNote/update/:id         controllers.FaqNoteController.update(id: Int)
+POST    /admin/faqNote/                   controllers.FaqNoteController.handleCreate
+POST    /admin/faqNote/update             controllers.FaqNoteController.handleUpdate
+POST    /admin/faqNote/delete             controllers.FaqNoteController.handleDelete
+
+GET     /admin/invoice/all                controllers.InvoiceController.all
+GET     /admin/invoice/create             controllers.InvoiceController.create
+GET     /admin/invoice/update/:id         controllers.InvoiceController.update(id: Int)
+POST    /admin/invoice/                   controllers.InvoiceController.handleCreate
+POST    /admin/invoice/update             controllers.InvoiceController.handleUpdate
+POST    /admin/invoice/delete             controllers.InvoiceController.handleDelete
+
+GET     /admin/order/all                  controllers.OrderController.all
+GET     /admin/order/create               controllers.OrderController.create
+GET     /admin/order/update/:id           controllers.OrderController.update(id: Int)
+POST    /admin/order/                     controllers.OrderController.handleCreate
+POST    /admin/order/update               controllers.OrderController.handleUpdate
+POST    /admin/order/delete               controllers.OrderController.handleDelete
+
+GET     /admin/orderItem/all              controllers.OrderItemController.all
+GET     /admin/orderItem/create           controllers.OrderItemController.create
+GET     /admin/orderItem/update/:id       controllers.OrderItemController.update(id: Int)
+POST    /admin/orderItem/                 controllers.OrderItemController.handleCreate
+POST    /admin/orderItem/update           controllers.OrderItemController.handleUpdate
+POST    /admin/orderItem/delete           controllers.OrderItemController.handleDelete
+
+GET     /admin/payment/all                controllers.PaymentController.all
+GET     /admin/payment/create             controllers.PaymentController.create
+GET     /admin/payment/update/:id         controllers.PaymentController.update(id: Int)
+POST    /admin/payment/                   controllers.PaymentController.handleCreate
+POST    /admin/payment/update             controllers.PaymentController.handleUpdate
+POST    /admin/payment/delete             controllers.PaymentController.handleDelete
+
+GET     /admin/product/all                controllers.ProductController.all
+GET     /admin/product/create             controllers.ProductController.create
+GET     /admin/product/update/:id         controllers.ProductController.update(id: Int)
+POST    /admin/product/                   controllers.ProductController.handleCreate
+POST    /admin/product/update             controllers.ProductController.handleUpdate
+POST    /admin/product/delete             controllers.ProductController.handleDelete
+
+GET     /admin/productType/all            controllers.ProductTypeController.all
+GET     /admin/productType/create         controllers.ProductTypeController.create
+GET     /admin/productType/update/:id     controllers.ProductTypeController.update(id: Int)
+POST    /admin/productType/               controllers.ProductTypeController.handleCreate
+POST    /admin/productType/update         controllers.ProductTypeController.handleUpdate
+POST    /admin/productType/delete         controllers.ProductTypeController.handleDelete
+
+GET     /admin/review/all                 controllers.ReviewController.all
+GET     /admin/review/create              controllers.ReviewController.create
+GET     /admin/review/update/:id          controllers.ReviewController.update(id: Int)
+POST    /admin/review/                    controllers.ReviewController.handleCreate
+POST    /admin/review/update              controllers.ReviewController.handleUpdate
+POST    /admin/review/delete              controllers.ReviewController.handleDelete
+
+GET     /admin/shipment/all               controllers.ShipmentController.all
+GET     /admin/shipment/create            controllers.ShipmentController.create
+GET     /admin/shipment/update/:id        controllers.ShipmentController.update(id: Int)
+POST    /admin/shipment/                  controllers.ShipmentController.handleCreate
+POST    /admin/shipment/update            controllers.ShipmentController.handleUpdate
+POST    /admin/shipment/delete            controllers.ShipmentController.handleDelete
+
+GET     /admin/user/all                   controllers.UserController.all
+GET     /admin/user/create                controllers.UserController.create
+GET     /admin/user/update/:id            controllers.UserController.update(id: Int)
+POST    /admin/user/                      controllers.UserController.handleCreate
+POST    /admin/user/update                controllers.UserController.handleUpdate
+POST    /admin/user/delete                controllers.UserController.handleDelete
+
+
+# ///////////////////////////
+# // JSON API
+# ///////////////////////////
+
++nocsrf
+POST    /api/faqNote                controllers.FaqNoteController.createREST
+GET     /api/faqNote/:id            controllers.FaqNoteController.readREST(id: Int)
+GET     /api/faqNote                controllers.FaqNoteController.readAllREST
++nocsrf
+PUT     /api/faqNote/:id            controllers.FaqNoteController.updateREST(id: Int)
++nocsrf
+DELETE  /api/faqNote/:id            controllers.FaqNoteController.deleteREST(id: Int)
+
+
++nocsrf
+POST    /api/invoice/:orderId       controllers.InvoiceController.createForOrder(orderId: Int)
++nocsrf
+POST    /api/invoice                controllers.InvoiceController.createREST
+GET     /api/invoice/:id            controllers.InvoiceController.readREST(id: Int)
+GET     /api/invoice                controllers.InvoiceController.readAllREST
++nocsrf
+PUT     /api/invoice/:id            controllers.InvoiceController.updateREST(id: Int)
++nocsrf
+DELETE  /api/invoice/:id            controllers.InvoiceController.deleteREST(id: Int)
+
+
++nocsrf
+POST    /api/order/item             controllers.OrderController.addItemREST
++nocsrf
+POST    /api/order                  controllers.OrderController.createREST
+GET     /api/order/by-user          controllers.OrderController.getUserOrdersREST
+GET     /api/order/:id              controllers.OrderController.readREST(id: Int)
+GET     /api/order                  controllers.OrderController.readAllREST
+GET     /api/order/checkout/:userId controllers.OrderController.getCheckoutREST(userId: Int)
++nocsrf
+PUT     /api/order/:id              controllers.OrderController.updateREST(id: Int)
++nocsrf
+PUT     /api/order/:id/delivered    controllers.OrderController.updateDeliveredREST(id: Int)
++nocsrf
+DELETE  /api/order/:id              controllers.OrderController.deleteREST(id: Int)
+
+
++nocsrf
+POST    /api/orderItem              controllers.OrderItemController.createREST
+GET     /api/orderItem/:id          controllers.OrderItemController.readREST(id: Int)
+GET     /api/orderItem              controllers.OrderItemController.readAllREST
++nocsrf
+PUT     /api/orderItem/:id          controllers.OrderItemController.updateREST(id: Int)
++nocsrf
+DELETE  /api/orderItem/:id          controllers.OrderItemController.deleteREST(id: Int)
+
+
++nocsrf
+POST    /api/payment/:invoiceId     controllers.PaymentController.payInvoice(invoiceId: Int)
++nocsrf
+POST    /api/payment                controllers.PaymentController.createREST
+GET     /api/payment/:id            controllers.PaymentController.readREST(id: Int)
+GET     /api/payment                controllers.PaymentController.readAllREST
++nocsrf
+PUT     /api/payment/:id            controllers.PaymentController.updateREST(id: Int)
++nocsrf
+DELETE  /api/payment/:id            controllers.PaymentController.deleteREST(id: Int)
+
+
++nocsrf
+POST    /api/product                controllers.ProductController.createREST
+GET     /api/product/:id            controllers.ProductController.readREST(id: Int)
+GET     /api/product                controllers.ProductController.readAllREST
++nocsrf
+PUT     /api/product/:id            controllers.ProductController.updateREST(id: Int)
++nocsrf
+DELETE  /api/product/:id            controllers.ProductController.deleteREST(id: Int)
+
+
++nocsrf
+POST    /api/productType            controllers.ProductTypeController.createREST
+GET     /api/productType/:id        controllers.ProductTypeController.readREST(id: Int)
+GET     /api/productType            controllers.ProductTypeController.readAllREST
++nocsrf
+PUT     /api/productType/:id        controllers.ProductTypeController.updateREST(id: Int)
++nocsrf
+DELETE  /api/productType/:id        controllers.ProductTypeController.deleteREST(id: Int)
+
+
++nocsrf
+POST    /api/review                 controllers.ReviewController.createREST
+GET     /api/review/:id             controllers.ReviewController.readREST(id: Int)
+GET     /api/review/by-product/:id  controllers.ReviewController.readAllForProductREST(id: Int)
+GET     /api/review                 controllers.ReviewController.readAllREST
++nocsrf
+PUT     /api/review/:id             controllers.ReviewController.updateREST(id: Int)
++nocsrf
+DELETE  /api/review/:id             controllers.ReviewController.deleteREST(id: Int)
+
+
++nocsrf
+POST    /api/shipment               controllers.ShipmentController.createREST
++nocsrf
+POST    /api/shipment/for-order     controllers.ShipmentController.createForOrderREST
+GET     /api/shipment/:id           controllers.ShipmentController.readREST(id: Int)
+GET     /api/shipment               controllers.ShipmentController.readAllREST
++nocsr
+PUT     /api/shipment/:id           controllers.ShipmentController.updateREST(id: Int)
++nocsrf
+DELETE  /api/shipment/:id           controllers.ShipmentController.deleteREST(id: Int)
+
+
+GET     /api/user/:id               controllers.UserController.readREST(id: Int)
+GET     /api/user                   controllers.UserController.readAllREST
++nocsrf
+PUT     /api/user/:id               controllers.UserController.updateREST(id: Int)
++nocsrf
+DELETE  /api/user/:id               controllers.UserController.deleteREST(id: Int)
+
+
+########################
+
+GET     /api/auth/:provider         controllers.AuthController.auth(provider: String)
+GET     /api/sign-out               controllers.AuthController.signOut
+
+
+GET     /$any<.*>                   controllers.ApplicationController.reactApp(any)
